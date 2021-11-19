@@ -27,32 +27,20 @@ package common;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import lombok.Data;
 
+@Data
 public class IdGenerator {
+    
     private String parentId;
+    
     private int branchId;
-
+    
     public IdGenerator(String parentId) {
         this.parentId = parentId;
     }
-
-    public String getParentId() {
-        return parentId;
-    }
-
-    public void setParentId(String parentId) {
-        this.parentId = parentId;
-    }
-
-    public int getBranchId() {
-        return branchId;
-    }
-
-    public void setBranchId(int branchId) {
-        this.branchId = branchId;
-    }
-
-
+    
+    
     public static String genGid(String dtm) throws Exception {
         String content = HttpUtil.get(dtm + "/newGid");
         try {
@@ -62,7 +50,7 @@ public class IdGenerator {
             throw new Exception("Can’t get gid, please check the dtm server.");
         }
     }
-
+    
     public String newBranchId() throws Exception {
         if (this.branchId >= 99) {
             throw new Exception("branch id is larger than 99");
