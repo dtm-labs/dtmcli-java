@@ -33,17 +33,19 @@ import java.util.HashMap;
 import java.util.function.Function;
 
 public class Tcc extends TransBase {
-
+    
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
+    
     public Tcc(String dtm, boolean waitResult) throws Exception {
         super(TransType.TCC, dtm, waitResult);
     }
-
+    
     public String tccGlobalTransaction(Function<Tcc, Boolean> function) {
-        HashMap<String, Object> paramMap = new HashMap<>();
+        HashMap<String, Object> paramMap = new HashMap<>(DEFAULT_INITIAL_CAPACITY);
         paramMap.put("gid", this.getGid());
         paramMap.put("trans_type", TransType.TCC.getValue());
-        HttpResponse response = HttpRequest.post(this.getDtm() + "/prepare")
-                .body(JSONUtil.toJsonStr(paramMap)).execute();
+        HttpResponse response = HttpRequest.post(this.getDtm() + "/prepare").body(JSONUtil.toJsonStr(paramMap))
+                .execute();
         if (checkResult(response)) {
             if (function.apply(this)) {
                 HttpRequest.post(this.getDtm() + "/submit").body(JSONUtil.toJsonStr(paramMap)).execute();
@@ -53,36 +55,32 @@ public class Tcc extends TransBase {
         }
         return this.getGid();
     }
-
+    
     public boolean callBranch(Object body, String tryUrl, String confirmUrl, String cancelUrl) throws Exception {
         String branchId = this.getIdGenerator().newBranchId();
-        HashMap<String, Object> paramMap1 = new HashMap<>();
-        paramMap1.put("gid", this.getGid());
-        paramMap1.put("branch_id", branchId);
-        paramMap1.put("trans_type", TransType.TCC.getValue());
-        paramMap1.put("status", "prepared");
-        paramMap1.put("data", body);
-        paramMap1.put("try", tryUrl);
-        paramMap1.put("confirm", confirmUrl);
-        paramMap1.put("cancel", cancelUrl);
-
-        HttpResponse response = HttpRequest.post(this.getDtm() + "/registerTccBranch")
-                .body(JSONUtil.toJsonStr(paramMap1))
-                .execute();
-
-        if (checkResult(response)) {
-            HashMap<String, Object> paramMap2 = new HashMap<>();
-            paramMap2.put("gid", this.getGid());
-            paramMap2.put("trans_type", TransType.TCC.getValue());
-            paramMap2.put("branch_id", branchId);
-            paramMap2.put("branch_type", "try");
-
-            HttpResponse response2 = HttpRequest.post(tryUrl)
-                    .body(JSONUtil.toJsonStr(body))
-                    .form(paramMap2)
-                    .execute();
-
-            return checkResult(response2);
+        HashMap<String, Object> registerParam = new HashMap<>(DEFAULT_INITIAL_CAPACITY);
+        registerParam.put("gid", this.getGid());
+        registerParam.put("branch_id", branchId);
+        registerParam.put("trans_type", TransType.TCC.getValue());
+        registerParam.put("status", "prepared");
+        registerParam.put("data", body);
+        registerParam.put("try", tryUrl);
+        registerParam.put("confirm", confirmUrl);
+        registerParam.put("cancel", cancelUrl);
+        
+        HttpResponse registerResponse = HttpRequest.post(this.getDtm() + "/registerTccBranch")
+                .body(JSONUtil.toJsonStr(registerParam)).execute();
+        
+        if (checkResult(registerResponse)) {
+            HashMap<String, Object> tryParam = new HashMap<>(DEFAULT_INITIAL_CAPACITY);
+            tryParam.put("gid", this.getGid());
+            tryParam.put("trans_type", TransType.TCC.getValue());
+            tryParam.put("branch_id", branchId);
+            tryParam.put("branch_type", "try");
+            
+            HttpResponse tryResponse = HttpRequest.post(tryUrl).body(JSONUtil.toJsonStr(body)).form(tryParam).execute();
+            
+            return checkResult(tryResponse);
         }
         return false;
     }

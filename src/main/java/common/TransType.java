@@ -25,15 +25,17 @@
 package common;
 
 public enum TransType {
+    // 事务类型
     TCC("tcc");
-
+    
     TransType(String value) {
         this.value = value;
     }
+    
     private String value;
-
-    public String getValue(){
+    
+    public String getValue() {
         return this.value;
     }
-
+    
 }
