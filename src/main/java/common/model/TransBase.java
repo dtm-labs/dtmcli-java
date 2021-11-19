@@ -22,43 +22,30 @@
  * SOFTWARE.
  */
 
-package common;
+package common.model;
 
-import cn.hutool.http.HttpUtil;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
+import common.enums.TransTypeEnum;
 import lombok.Data;
 
 @Data
-public class IdGenerator {
+public class TransBase {
     
-    private String parentId;
+    /**
+     * 全局事务id
+     */
+    private String gid;
     
-    private int branchId;
+    /**
+     * 事务类型
+     */
+    private TransTypeEnum transTypeEnum;
     
-    public IdGenerator(String parentId) {
-        this.parentId = parentId;
-    }
     
+    private boolean waitResult;
     
-    public static String genGid(String dtm) throws Exception {
-        String content = HttpUtil.get(dtm + "/newGid");
-        try {
-            JSONObject jsonObject = JSONUtil.parseObj(content);
-            return jsonObject.get("gid").toString();
-        } catch (Exception e) {
-            throw new Exception("Can’t get gid, please check the dtm server.");
-        }
-    }
-    
-    public String newBranchId() throws Exception {
-        if (this.branchId >= 99) {
-            throw new Exception("branch id is larger than 99");
-        }
-        if ((this.parentId + "").length() >= 20) {
-            throw new Exception("total branch id is longer than 20");
-        }
-        this.branchId++;
-        return this.parentId + String.format("%02d", this.branchId);
+    public TransBase(TransTypeEnum transTypeEnum, String gid, boolean waitResult) {
+        this.gid = gid;
+        this.transTypeEnum = transTypeEnum;
+        this.waitResult = waitResult;
     }
 }

@@ -22,20 +22,10 @@
  * SOFTWARE.
  */
 
-package common;
+package common.constant;
 
-public enum TransType {
-    // 事务类型
-    TCC("tcc");
+public class Constant {
     
-    TransType(String value) {
-        this.value = value;
-    }
-    
-    private String value;
-    
-    public String getValue() {
-        return this.value;
-    }
+    public static final int DEFAULT_INITIAL_CAPACITY = 16;
     
 }

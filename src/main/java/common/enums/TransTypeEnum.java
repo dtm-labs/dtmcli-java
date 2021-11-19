@@ -22,41 +22,20 @@
  * SOFTWARE.
  */
 
-package dtmcli;
+package common.enums;
 
-import cn.hutool.http.HttpResponse;
-import common.IdGenerator;
-import common.TransType;
-import lombok.Data;
-
-@Data
-public class TransBase {
+public enum TransTypeEnum {
+    // 事务类型
+    TCC("tcc");
     
-    private String gid;
-    
-    private TransType transType;
-    
-    private IdGenerator idGenerator;
-    
-    private String dtm;
-    
-    private boolean waitResult;
-    
-    public TransBase(TransType transType, String dtm, boolean waitResult) throws Exception {
-        this.gid = IdGenerator.genGid(dtm);
-        this.transType = transType;
-        this.dtm = dtm;
-        this.waitResult = waitResult;
-        this.idGenerator = new IdGenerator("");
+    TransTypeEnum(String value) {
+        this.value = value;
     }
     
-    public static boolean checkResult(HttpResponse response) {
-        if (!response.isOk()) {
-            return false;
-        }
-        if (response.body().contains("FAILURE")) {
-            return false;
-        }
-        return true;
+    private String value;
+    
+    public String getValue() {
+        return this.value;
     }
+    
 }

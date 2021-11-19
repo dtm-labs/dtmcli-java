@@ -1,0 +1,7 @@
+common/utils/IdGeneratorUtil.class
+tcc/Tcc.class
+common/enums/TransTypeEnum.class
+common/constant/ParamFieldConstant.class
+common/model/DtmServerInfo.class
+common/model/TransBase.class
+common/constant/Constant.class
