@@ -44,4 +44,10 @@ public class ParamFieldConstant {
     
     public static final String BRANCH_TYPE = "branch_type";
     
+    public static final String CODE = "code";
+    
+    public static final String MESSAGE = "message";
+    
+    public static final String DTM_RESULT = "dtm_result";
+    
 }
