@@ -24,18 +24,20 @@
 
 package tcc;
 
-import cn.hutool.http.HttpRequest;
-import cn.hutool.http.HttpResponse;
-import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSONObject;
 import common.constant.Constant;
 import common.model.DtmServerInfo;
+import common.utils.HttpUtil;
 import common.utils.IdGeneratorUtil;
 import common.constant.ParamFieldConstant;
 import common.enums.TransTypeEnum;
 import common.model.TransBase;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.HashMap;
-import java.util.Objects;
 import java.util.function.Function;
 
 public class Tcc {
@@ -43,6 +45,11 @@ public class Tcc {
     private static final String DEFAULT_STATUS = "prepared";
     
     private static final String BRANCH_TYPE = "try";
+    
+    private static final String FAIL_RESULT = "FAILURE";
+    
+    Logger log = LoggerFactory.getLogger(Tcc.class);
+    
     
     /**
      * 事务信息
@@ -65,16 +72,16 @@ public class Tcc {
         this.idGeneratorUtil = new IdGeneratorUtil("");
     }
     
-    public String tccGlobalTransaction(Function<Tcc, Boolean> function) {
+    public String tccGlobalTransaction(Function<Tcc, Boolean> function) throws IOException {
         HashMap<String, Object> paramMap = new HashMap<>(Constant.DEFAULT_INITIAL_CAPACITY);
         paramMap.put(ParamFieldConstant.GID, transBase.getGid());
         paramMap.put(ParamFieldConstant.TRANS_TYPE, TransTypeEnum.TCC.getValue());
-        HttpResponse response = HttpRequest.post(dtmServerInfo.prepare()).body(JSONUtil.toJsonStr(paramMap)).execute();
+        String response = HttpUtil.post(dtmServerInfo.prepare(), JSONObject.toJSONString(paramMap));
         if (this.checkResult(response)) {
             if (function.apply(this)) {
-                HttpRequest.post(dtmServerInfo.submit()).body(JSONUtil.toJsonStr(paramMap)).execute();
+                HttpUtil.post(dtmServerInfo.submit(), JSONObject.toJSONString(paramMap));
             } else {
-                HttpRequest.post(dtmServerInfo.abort()).body(JSONUtil.toJsonStr(paramMap)).execute();
+                HttpUtil.post(dtmServerInfo.abort(), JSONObject.toJSONString(paramMap));
             }
         }
         return transBase.getGid();
@@ -92,8 +99,8 @@ public class Tcc {
         registerParam.put(ParamFieldConstant.CONFIRM, confirmUrl);
         registerParam.put(ParamFieldConstant.CANCEL, cancelUrl);
         
-        HttpResponse registerResponse = HttpRequest.post(dtmServerInfo.registerTccBranch())
-                .body(JSONUtil.toJsonStr(registerParam)).execute();
+        String registerResponse = HttpUtil
+                .post(dtmServerInfo.registerTccBranch(), JSONObject.toJSONString(registerParam));
         
         if (this.checkResult(registerResponse)) {
             HashMap<String, Object> tryParam = new HashMap<>(Constant.DEFAULT_INITIAL_CAPACITY);
@@ -102,20 +109,28 @@ public class Tcc {
             tryParam.put(ParamFieldConstant.BRANCH_ID, branchId);
             tryParam.put(ParamFieldConstant.BRANCH_TYPE, BRANCH_TYPE);
             
-            HttpResponse tryResponse = HttpRequest.post(tryUrl).body(JSONUtil.toJsonStr(body)).form(tryParam).execute();
+            String tryResponse = HttpUtil.post(tryUrl, JSONObject.toJSONString(tryParam));
             
             return this.checkResult(tryResponse);
         }
         return false;
     }
     
-    public boolean checkResult(HttpResponse response) {
-        if (Objects.isNull(response)) {
+    public boolean checkResult(String response) {
+        if (StringUtils.isBlank(response)) {
             return false;
         }
-        if (!response.isOk()) {
+        JSONObject jsonObject = JSONObject.parseObject(response);
+        Object code = jsonObject.get(ParamFieldConstant.CODE);
+        if (null != code && (int) code >= 0) {
+            log.error("server error,message:{}", jsonObject.get(ParamFieldConstant.MESSAGE));
             return false;
         }
-        return !response.body().contains("FAILURE");
+        Object dtmResult = jsonObject.get(ParamFieldConstant.DTM_RESULT);
+        if (null == dtmResult || dtmResult.toString().equals(FAIL_RESULT)) {
+            log.error("server error,dtmResult:{}", dtmResult);
+            return false;
+        }
+        return true;
     }
 }

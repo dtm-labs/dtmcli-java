@@ -24,9 +24,7 @@
 
 package common.utils;
 
-import cn.hutool.http.HttpUtil;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
 
 @Data
@@ -52,13 +50,19 @@ public class IdGeneratorUtil {
      * @throws Exception
      */
     public static String genGid(String serverUrl) throws Exception {
-        String content = HttpUtil.get(serverUrl);
+        JSONObject jsonObject;
         try {
-            JSONObject jsonObject = JSONUtil.parseObj(content);
-            return jsonObject.get("gid").toString();
+            String content = HttpUtil.get(serverUrl);
+            jsonObject = JSONObject.parseObject(content);
         } catch (Exception e) {
             throw new Exception("Can’t get gid, please check the dtm server.");
         }
+        Object code = jsonObject.get("code");
+        if (null != code && (int) code > 0) {
+            Object message = jsonObject.get("message");
+            throw new Exception(message.toString());
+        }
+        return jsonObject.get("gid").toString();
     }
     
     /**
