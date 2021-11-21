@@ -26,8 +26,10 @@ package common.model;
 
 import common.enums.TransTypeEnum;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class TransBase {
     
     /**
