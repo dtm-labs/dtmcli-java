@@ -28,13 +28,13 @@ import lombok.Data;
 
 @Data
 public class TransResponse {
-    
-    private String dtm_result;
-    
+
+    private String dtmResult;
+
     public TransResponse(String dtmResult) {
-        this.dtm_result = dtmResult;
+        this.dtmResult = dtmResult;
     }
-    
+
     public static TransResponse buildTransResponse(String result) {
         return new TransResponse(result);
     }

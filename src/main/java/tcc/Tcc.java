@@ -28,7 +28,7 @@ import com.alibaba.fastjson.JSONObject;
 import common.constant.Constant;
 import common.model.DtmServerInfo;
 import common.utils.HttpUtil;
-import common.utils.IdGeneratorUtil;
+import common.utils.BranchIdGeneratorUtil;
 import common.constant.ParamFieldConstant;
 import common.enums.TransTypeEnum;
 import common.model.TransBase;
@@ -37,44 +37,42 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.function.Function;
 
 public class Tcc {
-    
+
     private static final String DEFAULT_STATUS = "prepared";
-    
+
     private static final String OP = "try";
-    
+
     private static final String FAIL_RESULT = "FAILURE";
-    
+
     Logger log = LoggerFactory.getLogger(Tcc.class);
-    
-    
+
+
     /**
      * 事务信息
      */
     private TransBase transBase;
-    
+
     /**
      * server 信息
      */
     private DtmServerInfo dtmServerInfo;
-    
+
     /**
      * id 生成器
      */
-    private IdGeneratorUtil idGeneratorUtil;
-    
-    public Tcc(String ipPort) throws Exception {
+    private BranchIdGeneratorUtil branchIdGeneratorUtil;
+
+    public Tcc(String ipPort, String gid) {
         this.dtmServerInfo = new DtmServerInfo(ipPort);
-        this.idGeneratorUtil = new IdGeneratorUtil("");
-        String gid = idGeneratorUtil.genGid(dtmServerInfo.newGid());
+        this.branchIdGeneratorUtil = new BranchIdGeneratorUtil("");
         this.transBase = new TransBase(TransTypeEnum.TCC, gid, false);
     }
-    
+
     public String tccGlobalTransaction(Function<Tcc, Boolean> function) throws IOException {
         HashMap<String, Object> paramMap = new HashMap<>(Constant.DEFAULT_INITIAL_CAPACITY);
         paramMap.put(ParamFieldConstant.GID, transBase.getGid());
@@ -89,9 +87,10 @@ public class Tcc {
         }
         return transBase.getGid();
     }
-    
+
     public boolean callBranch(Object body, String tryUrl, String confirmUrl, String cancelUrl) throws Exception {
-        String branchId = idGeneratorUtil.genBranchId();
+        // TODO: 2021/11/22 修改返回值为response
+        String branchId = branchIdGeneratorUtil.genBranchId();
         HashMap<String, Object> registerParam = new HashMap<>(Constant.DEFAULT_INITIAL_CAPACITY);
         registerParam.put(ParamFieldConstant.GID, transBase.getGid());
         registerParam.put(ParamFieldConstant.BRANCH_ID, branchId);
@@ -101,24 +100,26 @@ public class Tcc {
         registerParam.put(ParamFieldConstant.TRY, tryUrl);
         registerParam.put(ParamFieldConstant.CONFIRM, confirmUrl);
         registerParam.put(ParamFieldConstant.CANCEL, cancelUrl);
-        
+
         String registerResponse = HttpUtil
                 .post(dtmServerInfo.registerTccBranch(), JSONObject.toJSONString(registerParam));
-        
+
         if (this.checkResult(registerResponse)) {
             HashMap<String, Object> tryParam = new HashMap<>(Constant.DEFAULT_INITIAL_CAPACITY);
             tryParam.put(ParamFieldConstant.GID, Collections.singletonList(transBase.getGid()));
             tryParam.put(ParamFieldConstant.TRANS_TYPE, Collections.singletonList(TransTypeEnum.TCC.getValue()));
             tryParam.put(ParamFieldConstant.BRANCH_ID, Collections.singletonList(branchId));
             tryParam.put(ParamFieldConstant.OP, Collections.singletonList(OP));
-            
+
             String tryResponse = HttpUtil.post(tryUrl, JSONObject.toJSONString(tryParam));
-            
+
             return this.checkResult(tryResponse);
         }
         return false;
     }
-    
+
+
+    // TODO: 2021/11/23 需要修改判断dtmResult
     public boolean checkResult(String response) {
         if (StringUtils.isBlank(response)) {
             return false;
