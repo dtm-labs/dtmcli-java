@@ -62,7 +62,7 @@ public class BranchBarrier {
     /**
      * 操作
      */
-    @JsonProperty("branch_type")
+    @JsonProperty("op")
     private String op;
     
     /**

@@ -44,7 +44,7 @@ public class Tcc {
     
     private static final String DEFAULT_STATUS = "prepared";
     
-    private static final String BRANCH_TYPE = "try";
+    private static final String OP = "try";
     
     private static final String FAIL_RESULT = "FAILURE";
     
@@ -107,7 +107,7 @@ public class Tcc {
             tryParam.put(ParamFieldConstant.GID, transBase.getGid());
             tryParam.put(ParamFieldConstant.TRANS_TYPE, TransTypeEnum.TCC.getValue());
             tryParam.put(ParamFieldConstant.BRANCH_ID, branchId);
-            tryParam.put(ParamFieldConstant.BRANCH_TYPE, BRANCH_TYPE);
+            tryParam.put(ParamFieldConstant.OP, OP);
             
             String tryResponse = HttpUtil.post(tryUrl, JSONObject.toJSONString(tryParam));
             
