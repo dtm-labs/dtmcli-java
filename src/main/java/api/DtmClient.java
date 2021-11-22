@@ -22,82 +22,49 @@
  * SOFTWARE.
  */
 
-package common.model;
+package api;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
-public class DtmServerInfo {
+import saga.Saga;
+import tcc.Tcc;
+import xa.Xa;
+
+public class DtmClient {
     
-    /**
-     * ip+port
-     */
     private String ipPort;
     
-    
-    public static final String PREFIX = "http://";
-    
-    public static final String BASE = "/api/dtmsvr";
-    
-    public static final String NEW_GID = BASE + "/newGid";
-    
-    public static final String PREPARE = BASE + "/prepare";
-    
-    public static final String SUBMIT = BASE + "/submit";
-    
-    public static final String ABORT = BASE + "/abort";
-    
-    public static final String REGISTER_TCC_BRANCH = BASE + "/registerTccBranch";
-    
-    public DtmServerInfo(String ipPort) {
+    public DtmClient(String ipPort) {
         this.ipPort = ipPort;
     }
     
     /**
-     * 生成gid url
+     * 创建TCC事务
      *
      * @return
+     * @throws Exception
      */
-    public String newGid() {
-        return PREFIX + ipPort + NEW_GID;
+    public Tcc newTcc() throws Exception {
+        return new Tcc(ipPort);
     }
     
     /**
-     * 生成gid url
+     * 创建XA事务
      *
      * @return
+     * @throws Exception
      */
-    public String prepare() {
-        return PREFIX + ipPort + PREPARE;
+    public Xa newXA() throws Exception {
+        return new Xa();
     }
     
     /**
-     * submit 阶段 url
+     * 创建Saga事务
      *
      * @return
      */
-    public String submit() {
-        return PREFIX + ipPort + SUBMIT;
+    public Saga newSaga() {
+        return new Saga();
     }
     
-    /**
-     * abort 阶段 url
-     *
-     * @return
-     */
-    public String abort() {
-        return PREFIX + ipPort + ABORT;
-    }
-    
-    /**
-     * 注册tcc 事务分支
-     *
-     * @return
-     */
-    public String registerTccBranch() {
-        return PREFIX + ipPort + REGISTER_TCC_BRANCH;
-    }
     
 }

@@ -49,7 +49,7 @@ public class IdGeneratorUtil {
      * @return
      * @throws Exception
      */
-    public static String genGid(String serverUrl) throws Exception {
+    public String genGid(String serverUrl) throws Exception {
         JSONObject jsonObject;
         try {
             String content = HttpUtil.get(serverUrl);

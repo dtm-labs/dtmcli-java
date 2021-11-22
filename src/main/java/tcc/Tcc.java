@@ -66,10 +66,11 @@ public class Tcc {
      */
     private IdGeneratorUtil idGeneratorUtil;
     
-    public Tcc(TransBase transBase, DtmServerInfo dtmServerInfo) {
-        this.transBase = transBase;
-        this.dtmServerInfo = dtmServerInfo;
+    public Tcc(String address) throws Exception {
         this.idGeneratorUtil = new IdGeneratorUtil("");
+        String gid = idGeneratorUtil.genGid(dtmServerInfo.newGid());
+        this.transBase = new TransBase(TransTypeEnum.TCC, gid, false);
+        this.dtmServerInfo = new DtmServerInfo(address);
     }
     
     public String tccGlobalTransaction(Function<Tcc, Boolean> function) throws IOException {
