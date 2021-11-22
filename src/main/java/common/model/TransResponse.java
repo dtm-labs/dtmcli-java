@@ -22,49 +22,20 @@
  * SOFTWARE.
  */
 
-package api;
+package common.model;
 
+import lombok.Data;
 
-import saga.Saga;
-import tcc.Tcc;
-import xa.Xa;
-
-public class DtmClient {
+@Data
+public class TransResponse {
     
-    private String ipPort;
+    private String dtm_result;
     
-    public DtmClient(String ipPort) {
-        this.ipPort = ipPort;
+    public TransResponse(String dtmResult) {
+        this.dtm_result = dtmResult;
     }
     
-    /**
-     * 创建TCC事务
-     *
-     * @return
-     * @throws Exception
-     */
-    public Tcc newTcc() throws Exception {
-        return new Tcc(ipPort);
+    public static TransResponse buildTransResponse(String result) {
+        return new TransResponse(result);
     }
-    
-    /**
-     * 创建XA事务
-     *
-     * @return
-     * @throws Exception
-     */
-    public Xa newXA() throws Exception {
-        return new Xa();
-    }
-    
-    /**
-     * 创建Saga事务
-     *
-     * @return
-     */
-    public Saga newSaga() {
-        return new Saga();
-    }
-    
-    
 }

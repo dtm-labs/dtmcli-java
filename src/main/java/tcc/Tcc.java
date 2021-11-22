@@ -37,6 +37,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.function.Function;
 
@@ -66,11 +68,11 @@ public class Tcc {
      */
     private IdGeneratorUtil idGeneratorUtil;
     
-    public Tcc(String address) throws Exception {
+    public Tcc(String ipPort) throws Exception {
+        this.dtmServerInfo = new DtmServerInfo(ipPort);
         this.idGeneratorUtil = new IdGeneratorUtil("");
         String gid = idGeneratorUtil.genGid(dtmServerInfo.newGid());
         this.transBase = new TransBase(TransTypeEnum.TCC, gid, false);
-        this.dtmServerInfo = new DtmServerInfo(address);
     }
     
     public String tccGlobalTransaction(Function<Tcc, Boolean> function) throws IOException {
@@ -105,10 +107,10 @@ public class Tcc {
         
         if (this.checkResult(registerResponse)) {
             HashMap<String, Object> tryParam = new HashMap<>(Constant.DEFAULT_INITIAL_CAPACITY);
-            tryParam.put(ParamFieldConstant.GID, transBase.getGid());
-            tryParam.put(ParamFieldConstant.TRANS_TYPE, TransTypeEnum.TCC.getValue());
-            tryParam.put(ParamFieldConstant.BRANCH_ID, branchId);
-            tryParam.put(ParamFieldConstant.OP, OP);
+            tryParam.put(ParamFieldConstant.GID, Collections.singletonList(transBase.getGid()));
+            tryParam.put(ParamFieldConstant.TRANS_TYPE, Collections.singletonList(TransTypeEnum.TCC.getValue()));
+            tryParam.put(ParamFieldConstant.BRANCH_ID, Collections.singletonList(branchId));
+            tryParam.put(ParamFieldConstant.OP, Collections.singletonList(OP));
             
             String tryResponse = HttpUtil.post(tryUrl, JSONObject.toJSONString(tryParam));
             
