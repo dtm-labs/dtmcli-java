@@ -24,7 +24,6 @@
 
 package barrier;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import common.constant.ParamFieldConstant;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -44,67 +43,70 @@ public class BranchBarrier {
     /**
      * 事务类型
      */
-    @JsonProperty("trans_type")
     private String transType;
     
     /**
      * 全局事务id
      */
-    @JsonProperty("gid")
     private String gid;
     
     /**
      * 分支id
      */
-    @JsonProperty("branch_id")
     private String branchId;
     
     /**
      * 操作
      */
-    @JsonProperty("op")
     private String op;
     
     /**
      * 屏障id
      */
-    @JsonProperty("barrier_id")
     private int barrierId;
     
     
-    public BranchBarrier(String transType, String gid, String branchId, String op) {
-        this.transType = transType;
-        this.gid = gid;
-        this.branchId = branchId;
-        this.op = op;
+    public BranchBarrier(BarrierParam barrierParam) {
+        if (barrierParam.getTrans_type().length > 0) {
+            this.transType = barrierParam.getTrans_type()[0];
+        }
+        if (barrierParam.getGid().length > 0) {
+            this.gid = barrierParam.getGid()[0];
+        }
+        if (barrierParam.getBranch_id().length > 0) {
+            this.branchId = barrierParam.getBranch_id()[0];
+        }
+        if (barrierParam.getOp().length > 0) {
+            this.op = barrierParam.getOp()[0];
+        }
     }
     
-    public void call(Connection connection, Supplier<Boolean> supplier) throws SQLException {
+    public boolean call(Connection connection, Supplier<Boolean> supplier) throws SQLException {
         this.barrierId++;
         connection.setAutoCommit(false);
         try {
-            boolean result = getResult(connection);
+            boolean result = insertBarrier(connection);
             if (result) {
                 if (supplier.get()) {
                     connection.commit();
-                } else {
-                    connection.rollback();
+                    return true;
                 }
+                connection.rollback();
             }
-            connection.setAutoCommit(true);
         } catch (SQLException sqlException) {
             log.warn("barrier insert error", sqlException);
             connection.rollback();
         } finally {
+            connection.setAutoCommit(true);
             connection.close();
         }
+        return false;
     }
     
-    private boolean getResult(Connection connection) throws SQLException {
+    private boolean insertBarrier(Connection connection) throws SQLException {
         if (Objects.isNull(connection)) {
             return false;
         }
-        
         PreparedStatement preparedStatement = null;
         boolean result;
         try {
@@ -117,17 +119,20 @@ public class BranchBarrier {
             preparedStatement.setString(6, op);
             
             result = false;
+            int opIndex = 4;
             if (op.equals(ParamFieldConstant.TRY) || op.equals(ParamFieldConstant.CONFIRM)) {
-                preparedStatement.setString(4, op);
+                preparedStatement.setString(opIndex, op);
                 result = preparedStatement.executeUpdate() > 0;
             } else if (op.equals(ParamFieldConstant.CANCEL)) {
                 // 先插入try
-                preparedStatement.setString(4, ParamFieldConstant.TRY);
+                preparedStatement.setString(opIndex, ParamFieldConstant.TRY);
                 boolean tryResult = preparedStatement.executeUpdate() > 0;
                 // 插入cancel
-                if (tryResult) {
-                    preparedStatement.setString(4, op);
-                    result = preparedStatement.executeUpdate() > 0;
+                preparedStatement.setString(opIndex, op);
+                boolean cancelResult = preparedStatement.executeUpdate() > 0;
+                
+                if (!tryResult && cancelResult) {
+                    result = true;
                 }
             }
         } finally {

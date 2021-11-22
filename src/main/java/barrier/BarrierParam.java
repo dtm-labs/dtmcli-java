@@ -22,14 +22,34 @@
  * SOFTWARE.
  */
 
-package common.constant;
+package barrier;
 
-public class Constant {
+import lombok.Data;
+
+/**
+ * dtm 服务端传过来的字段格式为下划线分隔，为了减少sdk对json包依赖也采用下划线格式
+ */
+@Data
+public class BarrierParam {
     
-    public static final int DEFAULT_INITIAL_CAPACITY = 16;
+    /**
+     * 事务类型
+     */
+    private String trans_type[];
     
-    public static final String SUCCESS_RESULT = "SUCCESS";
+    /**
+     * 全局事务id
+     */
+    private String gid[];
     
-    public static final String FAILURE_RESULT = "FAILURE";
+    /**
+     * 分支id
+     */
+    private String branch_id[];
+    
+    /**
+     * 操作
+     */
+    private String op[];
     
 }

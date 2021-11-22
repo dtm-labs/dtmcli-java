@@ -17,7 +17,6 @@
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <slf4j-api.version>1.7.30</slf4j-api.version>
         <mysql-connector-java.version>8.0.26</mysql-connector-java.version>
-        <jackson-annotations.version>2.12.4</jackson-annotations.version>
     </properties>
     
     <dependencies>
@@ -50,11 +49,6 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql-connector-java.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>${jackson-annotations.version}</version>
         </dependency>
     </dependencies>
 

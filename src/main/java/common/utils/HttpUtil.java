@@ -32,10 +32,12 @@ import okhttp3.Response;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 public class HttpUtil {
     
-    private static final OkHttpClient CLIENT = new OkHttpClient();
+    private static final OkHttpClient CLIENT = new OkHttpClient.Builder().connectTimeout(15, TimeUnit.SECONDS)
+            .readTimeout(5, TimeUnit.SECONDS).writeTimeout(5, TimeUnit.SECONDS).build();
     
     public static final MediaType MEDIA_TYPE = MediaType.get("application/json; charset=utf-8");
     

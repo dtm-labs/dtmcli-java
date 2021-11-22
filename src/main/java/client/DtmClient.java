@@ -22,14 +22,49 @@
  * SOFTWARE.
  */
 
-package common.constant;
+package client;
 
-public class Constant {
+
+import saga.Saga;
+import tcc.Tcc;
+import xa.Xa;
+
+public class DtmClient {
     
-    public static final int DEFAULT_INITIAL_CAPACITY = 16;
+    private String ipPort;
     
-    public static final String SUCCESS_RESULT = "SUCCESS";
+    public DtmClient(String ipPort) {
+        this.ipPort = ipPort;
+    }
     
-    public static final String FAILURE_RESULT = "FAILURE";
+    /**
+     * 创建TCC事务
+     *
+     * @return
+     * @throws Exception
+     */
+    public Tcc newTcc() throws Exception {
+        return new Tcc(ipPort);
+    }
+    
+    /**
+     * 创建XA事务
+     *
+     * @return
+     * @throws Exception
+     */
+    public Xa newXA() throws Exception {
+        return new Xa();
+    }
+    
+    /**
+     * 创建Saga事务
+     *
+     * @return
+     */
+    public Saga newSaga() {
+        return new Saga();
+    }
+    
     
 }
