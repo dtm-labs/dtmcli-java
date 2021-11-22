@@ -42,7 +42,7 @@ public class ParamFieldConstant {
     
     public static final String CANCEL = "cancel";
     
-    public static final String BRANCH_TYPE = "branch_type";
+    public static final String OP = "op";
     
     public static final String CODE = "code";
     
