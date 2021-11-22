@@ -81,32 +81,32 @@ public class BranchBarrier {
         }
     }
     
-    public void call(Connection connection, Supplier<Boolean> supplier) throws SQLException {
+    public boolean call(Connection connection, Supplier<Boolean> supplier) throws SQLException {
         this.barrierId++;
         connection.setAutoCommit(false);
         try {
-            boolean result = getResult(connection);
+            boolean result = insertBarrier(connection);
             if (result) {
                 if (supplier.get()) {
                     connection.commit();
-                } else {
-                    connection.rollback();
+                    return true;
                 }
+                connection.rollback();
             }
-            connection.setAutoCommit(true);
         } catch (SQLException sqlException) {
             log.warn("barrier insert error", sqlException);
             connection.rollback();
         } finally {
+            connection.setAutoCommit(true);
             connection.close();
         }
+        return false;
     }
     
-    private boolean getResult(Connection connection) throws SQLException {
+    private boolean insertBarrier(Connection connection) throws SQLException {
         if (Objects.isNull(connection)) {
             return false;
         }
-        
         PreparedStatement preparedStatement = null;
         boolean result;
         try {
@@ -119,17 +119,20 @@ public class BranchBarrier {
             preparedStatement.setString(6, op);
             
             result = false;
+            int opIndex = 4;
             if (op.equals(ParamFieldConstant.TRY) || op.equals(ParamFieldConstant.CONFIRM)) {
-                preparedStatement.setString(4, op);
+                preparedStatement.setString(opIndex, op);
                 result = preparedStatement.executeUpdate() > 0;
             } else if (op.equals(ParamFieldConstant.CANCEL)) {
                 // 先插入try
-                preparedStatement.setString(4, ParamFieldConstant.TRY);
+                preparedStatement.setString(opIndex, ParamFieldConstant.TRY);
                 boolean tryResult = preparedStatement.executeUpdate() > 0;
                 // 插入cancel
-                if (tryResult) {
-                    preparedStatement.setString(4, op);
-                    result = preparedStatement.executeUpdate() > 0;
+                preparedStatement.setString(opIndex, op);
+                boolean cancelResult = preparedStatement.executeUpdate() > 0;
+                
+                if (!tryResult && cancelResult) {
+                    result = true;
                 }
             }
         } finally {
