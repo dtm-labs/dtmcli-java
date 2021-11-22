@@ -25,28 +25,31 @@
 package client;
 
 
+import com.alibaba.fastjson.JSONObject;
+import common.model.DtmServerInfo;
+import common.utils.HttpUtil;
 import saga.Saga;
 import tcc.Tcc;
 import xa.Xa;
 
 public class DtmClient {
-    
+
     private String ipPort;
-    
+
     public DtmClient(String ipPort) {
         this.ipPort = ipPort;
     }
-    
+
     /**
      * 创建TCC事务
      *
      * @return
      * @throws Exception
      */
-    public Tcc newTcc() throws Exception {
-        return new Tcc(ipPort);
+    public Tcc newTcc(String gid) throws Exception {
+        return new Tcc(ipPort, gid);
     }
-    
+
     /**
      * 创建XA事务
      *
@@ -56,7 +59,7 @@ public class DtmClient {
     public Xa newXA() throws Exception {
         return new Xa();
     }
-    
+
     /**
      * 创建Saga事务
      *
@@ -65,6 +68,30 @@ public class DtmClient {
     public Saga newSaga() {
         return new Saga();
     }
-    
-    
+
+
+    /**
+     * 生成全局事务id
+     *
+     * @return
+     * @throws Exception
+     */
+    public String genGid() throws Exception {
+        DtmServerInfo dtmServerInfo = new DtmServerInfo(ipPort);
+        JSONObject jsonObject;
+        try {
+            String content = HttpUtil.get(dtmServerInfo.newGid());
+            jsonObject = JSONObject.parseObject(content);
+        } catch (Exception e) {
+            throw new Exception("Can’t get gid, please check the dtm server.");
+        }
+        Object code = jsonObject.get("code");
+        if (null != code && (int) code > 0) {
+            Object message = jsonObject.get("message");
+            throw new Exception(message.toString());
+        }
+        return jsonObject.get("gid").toString();
+    }
+
+
 }

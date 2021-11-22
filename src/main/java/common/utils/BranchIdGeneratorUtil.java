@@ -24,47 +24,23 @@
 
 package common.utils;
 
-import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
 
 @Data
-public class IdGeneratorUtil {
-    
+public class BranchIdGeneratorUtil {
+
     private static final int MAX_BRANCH_ID = 99;
-    
+
     private static final int LENGTH = 20;
-    
+
     private String branchId;
-    
+
     private int subBranchId;
-    
-    public IdGeneratorUtil(String parentId) {
-        this.branchId = parentId;
+
+    public BranchIdGeneratorUtil(String branchId) {
+        this.branchId = branchId;
     }
-    
-    /**
-     * 生成全局事务id
-     *
-     * @param serverUrl
-     * @return
-     * @throws Exception
-     */
-    public String genGid(String serverUrl) throws Exception {
-        JSONObject jsonObject;
-        try {
-            String content = HttpUtil.get(serverUrl);
-            jsonObject = JSONObject.parseObject(content);
-        } catch (Exception e) {
-            throw new Exception("Can’t get gid, please check the dtm server.");
-        }
-        Object code = jsonObject.get("code");
-        if (null != code && (int) code > 0) {
-            Object message = jsonObject.get("message");
-            throw new Exception(message.toString());
-        }
-        return jsonObject.get("gid").toString();
-    }
-    
+
     /**
      * 生成注册分支id
      *

@@ -33,39 +33,39 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Objects;
-import java.util.function.Supplier;
+import java.util.function.Consumer;
 
 @Data
 @NoArgsConstructor
 @Slf4j
 public class BranchBarrier {
-    
+
     /**
      * 事务类型
      */
     private String transType;
-    
+
     /**
      * 全局事务id
      */
     private String gid;
-    
+
     /**
      * 分支id
      */
     private String branchId;
-    
+
     /**
      * 操作
      */
     private String op;
-    
+
     /**
      * 屏障id
      */
     private int barrierId;
-    
-    
+
+
     public BranchBarrier(BarrierParam barrierParam) {
         if (barrierParam.getTrans_type().length > 0) {
             this.transType = barrierParam.getTrans_type()[0];
@@ -80,59 +80,55 @@ public class BranchBarrier {
             this.op = barrierParam.getOp()[0];
         }
     }
-    
-    public boolean call(Connection connection, Supplier<Boolean> supplier) throws SQLException {
+
+    /**
+     * connection 由使用方自行管理，创建、回收。
+     *
+     * @param connection
+     * @param consumer
+     * @return
+     * @throws SQLException
+     */
+    public void call(Connection connection, Consumer<BranchBarrier> consumer) throws SQLException {
         this.barrierId++;
         connection.setAutoCommit(false);
         try {
             boolean result = insertBarrier(connection);
             if (result) {
-                if (supplier.get()) {
-                    connection.commit();
-                    return true;
-                }
-                connection.rollback();
+                consumer.accept(this);
+                connection.commit();
             }
-        } catch (SQLException sqlException) {
-            log.warn("barrier insert error", sqlException);
+        } catch (Exception exception) {
+            log.warn("barrier call error", exception);
             connection.rollback();
         } finally {
             connection.setAutoCommit(true);
-            connection.close();
         }
-        return false;
     }
-    
+
     private boolean insertBarrier(Connection connection) throws SQLException {
         if (Objects.isNull(connection)) {
             return false;
         }
         PreparedStatement preparedStatement = null;
-        boolean result;
         try {
             String sql = "insert ignore into barrier(trans_type, gid, branch_id, op, barrier_id, reason) values(?,?,?,?,?,?)";
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, transType);
             preparedStatement.setString(2, gid);
             preparedStatement.setString(3, branchId);
+            preparedStatement.setString(4, op);
             preparedStatement.setString(5, String.format("%02d", barrierId));
             preparedStatement.setString(6, op);
-            
-            result = false;
-            int opIndex = 4;
-            if (op.equals(ParamFieldConstant.TRY) || op.equals(ParamFieldConstant.CONFIRM)) {
-                preparedStatement.setString(opIndex, op);
-                result = preparedStatement.executeUpdate() > 0;
-            } else if (op.equals(ParamFieldConstant.CANCEL)) {
-                // 先插入try
+
+            if (preparedStatement.executeUpdate() == 0) {
+                return false;
+            }
+            if (op.equals(ParamFieldConstant.CANCEL)) {
+                int opIndex = 4;
                 preparedStatement.setString(opIndex, ParamFieldConstant.TRY);
-                boolean tryResult = preparedStatement.executeUpdate() > 0;
-                // 插入cancel
-                preparedStatement.setString(opIndex, op);
-                boolean cancelResult = preparedStatement.executeUpdate() > 0;
-                
-                if (!tryResult && cancelResult) {
-                    result = true;
+                if (preparedStatement.executeUpdate() > 0) {
+                    return false;
                 }
             }
         } finally {
@@ -140,6 +136,6 @@ public class BranchBarrier {
                 preparedStatement.close();
             }
         }
-        return result;
+        return true;
     }
 }
