@@ -48,11 +48,9 @@ public class HttpUtil {
      * @return
      * @throws IOException
      */
-    public static String get(String url) throws IOException {
+    public static Response get(String url) throws IOException {
         Request request = new Request.Builder().url(url).get().build();
-        try (Response response = CLIENT.newCall(request).execute()) {
-            return Objects.requireNonNull(response.body()).string();
-        }
+        return CLIENT.newCall(request).execute();
     }
     
     /**
@@ -63,11 +61,9 @@ public class HttpUtil {
      * @return
      * @throws IOException
      */
-    public static String post(String url, String json) throws IOException {
+    public static Response post(String url, String json) throws IOException {
         RequestBody body = RequestBody.create(MEDIA_TYPE, json);
         Request request = new Request.Builder().url(url).post(body).build();
-        try (Response response = CLIENT.newCall(request).execute()) {
-            return Objects.requireNonNull(response.body()).string();
-        }
+        return CLIENT.newCall(request).execute();
     }
 }
