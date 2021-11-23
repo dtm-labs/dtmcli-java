@@ -38,7 +38,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.function.Function;
 
@@ -105,15 +104,17 @@ public class Tcc {
                 .post(dtmServerInfo.registerTccBranch(), JSONObject.toJSONString(registerParam));
         
         if (this.checkResult(registerResponse.body().string())) {
-            HashMap<String, Object> tryParam = new HashMap<>(Constant.DEFAULT_INITIAL_CAPACITY);
-            tryParam.put(ParamFieldConstant.GID, Collections.singletonList(transBase.getGid()));
-            tryParam.put(ParamFieldConstant.TRANS_TYPE, Collections.singletonList(TransTypeEnum.TCC.getValue()));
-            tryParam.put(ParamFieldConstant.BRANCH_ID, Collections.singletonList(branchId));
-            tryParam.put(ParamFieldConstant.OP, Collections.singletonList(OP));
-    
-            return HttpUtil.post(tryUrl, JSONObject.toJSONString(tryParam));
+            return HttpUtil.post(splicingTryUrl(tryUrl, transBase.getGid(), TransTypeEnum.TCC.getValue(), branchId, OP),
+                    JSONObject.toJSONString(body));
         }
         return null;
+    }
+    
+    /**
+     * 和go 保持同样的发送方式 参数拼在url后边
+     */
+    private String splicingTryUrl(String tryUrl, String gid, String transType, String branchId, String op) {
+        return tryUrl + "?gid=" + gid + "&trans_type=" + transType + "&branch_id=" + branchId + "&op=" + op;
     }
     
     
