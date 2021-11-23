@@ -26,15 +26,14 @@ package barrier;
 
 import com.alibaba.fastjson.JSONObject;
 import common.constant.ParamFieldConstant;
-import common.utils.StreamUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -69,12 +68,11 @@ public class BranchBarrier {
     private int barrierId;
     
     
-    public BranchBarrier(InputStream inputStream) throws Exception {
-        byte[] bytes = StreamUtil.copyToByteArray(inputStream);
-        BarrierParam barrierParam = JSONObject.parseObject(bytes, BarrierParam.class);
-        if (Objects.isNull(barrierParam)) {
-            throw new Exception("read InputStream null");
+    public BranchBarrier(Map<String, String[]> parameterMap) throws Exception {
+        if (null == parameterMap) {
+            throw new Exception("BranchBarrier parameterMap null!");
         }
+        BarrierParam barrierParam = JSONObject.parseObject(JSONObject.toJSONString(parameterMap), BarrierParam.class);
         if (barrierParam.getTrans_type().length > 0) {
             this.transType = barrierParam.getTrans_type()[0];
         }
