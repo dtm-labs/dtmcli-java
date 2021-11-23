@@ -95,7 +95,7 @@ public class Tcc {
         registerParam.put(ParamFieldConstant.BRANCH_ID, branchId);
         registerParam.put(ParamFieldConstant.TRANS_TYPE, TransTypeEnum.TCC.getValue());
         registerParam.put(ParamFieldConstant.STATUS, DEFAULT_STATUS);
-        registerParam.put(ParamFieldConstant.DATA, body);
+        registerParam.put(ParamFieldConstant.DATA, JSONObject.toJSONString(body));
         registerParam.put(ParamFieldConstant.TRY, tryUrl);
         registerParam.put(ParamFieldConstant.CONFIRM, confirmUrl);
         registerParam.put(ParamFieldConstant.CANCEL, cancelUrl);
