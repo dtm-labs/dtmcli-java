@@ -32,6 +32,7 @@ import common.utils.BranchIdGeneratorUtil;
 import common.constant.ParamFieldConstant;
 import common.enums.TransTypeEnum;
 import common.model.TransBase;
+import okhttp3.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,43 +43,43 @@ import java.util.HashMap;
 import java.util.function.Function;
 
 public class Tcc {
-
+    
     private static final String DEFAULT_STATUS = "prepared";
-
+    
     private static final String OP = "try";
-
+    
     private static final String FAIL_RESULT = "FAILURE";
-
+    
     Logger log = LoggerFactory.getLogger(Tcc.class);
-
-
+    
+    
     /**
      * 事务信息
      */
     private TransBase transBase;
-
+    
     /**
      * server 信息
      */
     private DtmServerInfo dtmServerInfo;
-
+    
     /**
      * id 生成器
      */
     private BranchIdGeneratorUtil branchIdGeneratorUtil;
-
+    
     public Tcc(String ipPort, String gid) {
         this.dtmServerInfo = new DtmServerInfo(ipPort);
         this.branchIdGeneratorUtil = new BranchIdGeneratorUtil("");
         this.transBase = new TransBase(TransTypeEnum.TCC, gid, false);
     }
-
+    
     public String tccGlobalTransaction(Function<Tcc, Boolean> function) throws IOException {
         HashMap<String, Object> paramMap = new HashMap<>(Constant.DEFAULT_INITIAL_CAPACITY);
         paramMap.put(ParamFieldConstant.GID, transBase.getGid());
         paramMap.put(ParamFieldConstant.TRANS_TYPE, TransTypeEnum.TCC.getValue());
-        String response = HttpUtil.post(dtmServerInfo.prepare(), JSONObject.toJSONString(paramMap));
-        if (this.checkResult(response)) {
+        Response post = HttpUtil.post(dtmServerInfo.prepare(), JSONObject.toJSONString(paramMap));
+        if (this.checkResult(post.body().string())) {
             if (function.apply(this)) {
                 HttpUtil.post(dtmServerInfo.submit(), JSONObject.toJSONString(paramMap));
             } else {
@@ -87,9 +88,8 @@ public class Tcc {
         }
         return transBase.getGid();
     }
-
-    public boolean callBranch(Object body, String tryUrl, String confirmUrl, String cancelUrl) throws Exception {
-        // TODO: 2021/11/22 修改返回值为response
+    
+    public Response callBranch(Object body, String tryUrl, String confirmUrl, String cancelUrl) throws Exception {
         String branchId = branchIdGeneratorUtil.genBranchId();
         HashMap<String, Object> registerParam = new HashMap<>(Constant.DEFAULT_INITIAL_CAPACITY);
         registerParam.put(ParamFieldConstant.GID, transBase.getGid());
@@ -100,26 +100,23 @@ public class Tcc {
         registerParam.put(ParamFieldConstant.TRY, tryUrl);
         registerParam.put(ParamFieldConstant.CONFIRM, confirmUrl);
         registerParam.put(ParamFieldConstant.CANCEL, cancelUrl);
-
-        String registerResponse = HttpUtil
+        
+        Response registerResponse = HttpUtil
                 .post(dtmServerInfo.registerTccBranch(), JSONObject.toJSONString(registerParam));
-
-        if (this.checkResult(registerResponse)) {
+        
+        if (this.checkResult(registerResponse.body().string())) {
             HashMap<String, Object> tryParam = new HashMap<>(Constant.DEFAULT_INITIAL_CAPACITY);
             tryParam.put(ParamFieldConstant.GID, Collections.singletonList(transBase.getGid()));
             tryParam.put(ParamFieldConstant.TRANS_TYPE, Collections.singletonList(TransTypeEnum.TCC.getValue()));
             tryParam.put(ParamFieldConstant.BRANCH_ID, Collections.singletonList(branchId));
             tryParam.put(ParamFieldConstant.OP, Collections.singletonList(OP));
-
-            String tryResponse = HttpUtil.post(tryUrl, JSONObject.toJSONString(tryParam));
-
-            return this.checkResult(tryResponse);
+    
+            return HttpUtil.post(tryUrl, JSONObject.toJSONString(tryParam));
         }
-        return false;
+        return null;
     }
-
-
-    // TODO: 2021/11/23 需要修改判断dtmResult
+    
+    
     public boolean checkResult(String response) {
         if (StringUtils.isBlank(response)) {
             return false;

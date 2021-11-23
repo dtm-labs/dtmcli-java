@@ -24,11 +24,14 @@
 
 package barrier;
 
+import com.alibaba.fastjson.JSONObject;
 import common.constant.ParamFieldConstant;
+import common.utils.StreamUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -39,34 +42,39 @@ import java.util.function.Consumer;
 @NoArgsConstructor
 @Slf4j
 public class BranchBarrier {
-
+    
     /**
      * 事务类型
      */
     private String transType;
-
+    
     /**
      * 全局事务id
      */
     private String gid;
-
+    
     /**
      * 分支id
      */
     private String branchId;
-
+    
     /**
      * 操作
      */
     private String op;
-
+    
     /**
      * 屏障id
      */
     private int barrierId;
-
-
-    public BranchBarrier(BarrierParam barrierParam) {
+    
+    
+    public BranchBarrier(InputStream inputStream) throws Exception {
+        byte[] bytes = StreamUtil.copyToByteArray(inputStream);
+        BarrierParam barrierParam = JSONObject.parseObject(bytes, BarrierParam.class);
+        if (Objects.isNull(barrierParam)) {
+            throw new Exception("read InputStream null");
+        }
         if (barrierParam.getTrans_type().length > 0) {
             this.transType = barrierParam.getTrans_type()[0];
         }
@@ -80,7 +88,7 @@ public class BranchBarrier {
             this.op = barrierParam.getOp()[0];
         }
     }
-
+    
     /**
      * connection 由使用方自行管理，创建、回收。
      *
@@ -105,7 +113,7 @@ public class BranchBarrier {
             connection.setAutoCommit(true);
         }
     }
-
+    
     private boolean insertBarrier(Connection connection) throws SQLException {
         if (Objects.isNull(connection)) {
             return false;
@@ -120,7 +128,7 @@ public class BranchBarrier {
             preparedStatement.setString(4, op);
             preparedStatement.setString(5, String.format("%02d", barrierId));
             preparedStatement.setString(6, op);
-
+            
             if (preparedStatement.executeUpdate() == 0) {
                 return false;
             }
