@@ -32,12 +32,12 @@ import common.utils.BranchIdGeneratorUtil;
 import common.constant.ParamFieldConstant;
 import common.enums.TransTypeEnum;
 import common.model.TransBase;
+import exception.DtmException;
 import okhttp3.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.function.Function;
 
@@ -73,17 +73,20 @@ public class Tcc {
         this.transBase = new TransBase(TransTypeEnum.TCC, gid, false);
     }
     
-    public String tccGlobalTransaction(Function<Tcc, Boolean> function) throws IOException {
+    public String tccGlobalTransaction(Function<Tcc, Boolean> function) throws Exception {
         HashMap<String, Object> paramMap = new HashMap<>(Constant.DEFAULT_INITIAL_CAPACITY);
         paramMap.put(ParamFieldConstant.GID, transBase.getGid());
         paramMap.put(ParamFieldConstant.TRANS_TYPE, TransTypeEnum.TCC.getValue());
         Response post = HttpUtil.post(dtmServerInfo.prepare(), JSONObject.toJSONString(paramMap));
-        if (this.checkResult(post.body().string())) {
+        this.checkResult(post.body().string());
+        try {
             if (function.apply(this)) {
                 HttpUtil.post(dtmServerInfo.submit(), JSONObject.toJSONString(paramMap));
             } else {
                 HttpUtil.post(dtmServerInfo.abort(), JSONObject.toJSONString(paramMap));
             }
+        }catch (Exception e){
+            HttpUtil.post(dtmServerInfo.abort(), JSONObject.toJSONString(paramMap));
         }
         return transBase.getGid();
     }
@@ -103,11 +106,13 @@ public class Tcc {
         Response registerResponse = HttpUtil
                 .post(dtmServerInfo.registerTccBranch(), JSONObject.toJSONString(registerParam));
         
-        if (this.checkResult(registerResponse.body().string())) {
+        try {
+            this.checkResult(registerResponse.body().string());
             return HttpUtil.post(splicingTryUrl(tryUrl, transBase.getGid(), TransTypeEnum.TCC.getValue(), branchId, OP),
                     JSONObject.toJSONString(body));
+        }catch (Exception e){
+            throw new Exception(e);
         }
-        return null;
     }
     
     /**
@@ -118,21 +123,20 @@ public class Tcc {
     }
     
     
-    public boolean checkResult(String response) {
+    public void checkResult(String response) {
         if (StringUtils.isBlank(response)) {
-            return false;
+            throw new DtmException("response is null");
         }
         JSONObject jsonObject = JSONObject.parseObject(response);
         Object code = jsonObject.get(ParamFieldConstant.CODE);
         if (null != code && (int) code >= 0) {
             log.error("server error,message:{}", jsonObject.get(ParamFieldConstant.MESSAGE));
-            return false;
+            throw new DtmException("server error code >0");
         }
         Object dtmResult = jsonObject.get(ParamFieldConstant.DTM_RESULT);
         if (null == dtmResult || dtmResult.toString().equals(FAIL_RESULT)) {
             log.error("server error,dtmResult:{}", dtmResult);
-            return false;
+            throw new DtmException("Service returned failed");
         }
-        return true;
     }
 }
