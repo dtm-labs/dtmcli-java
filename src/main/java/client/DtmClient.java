@@ -31,8 +31,9 @@ import common.utils.HttpUtil;
 import okhttp3.Response;
 import tcc.Tcc;
 
+import java.io.IOException;
 import java.util.Objects;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 /**
  * @author lixiaoshuang
@@ -82,7 +83,7 @@ public class DtmClient {
      * @return
      * @throws Exception
      */
-    public void tccGlobalTransaction(String gid, Function<Tcc, Boolean> function) throws Exception {
+    public void tccGlobalTransaction(String gid, Consumer<Tcc> function) throws IOException {
         Tcc tcc = new Tcc(ipPort, gid);
         tcc.tccGlobalTransaction(function);
     }

@@ -24,9 +24,9 @@
 
 package exception;
 
-public class DtmException extends RuntimeException {
+public class FailureException extends RuntimeException {
     
-    public DtmException(String message) {
+    public FailureException(String message) {
         super(message);
     }
 }
