@@ -28,6 +28,8 @@ import lombok.Data;
 
 /**
  * dtm 服务端传过来的字段格式为下划线分隔，为了减少sdk对json包依赖也采用下划线格式
+ *
+ * @author lixiaoshuang
  */
 @Data
 public class BarrierParam {

@@ -29,12 +29,14 @@ import com.alibaba.fastjson.JSONObject;
 import common.model.DtmServerInfo;
 import common.utils.HttpUtil;
 import okhttp3.Response;
-import saga.Saga;
 import tcc.Tcc;
-import xa.Xa;
 
 import java.util.Objects;
+import java.util.function.Function;
 
+/**
+ * @author lixiaoshuang
+ */
 public class DtmClient {
     
     private String ipPort;
@@ -42,36 +44,6 @@ public class DtmClient {
     public DtmClient(String ipPort) {
         this.ipPort = ipPort;
     }
-    
-    /**
-     * 创建TCC事务
-     *
-     * @return
-     * @throws Exception
-     */
-    public Tcc newTcc(String gid) throws Exception {
-        return new Tcc(ipPort, gid);
-    }
-    
-    /**
-     * 创建XA事务
-     *
-     * @return
-     * @throws Exception
-     */
-    public Xa newXA() throws Exception {
-        return new Xa();
-    }
-    
-    /**
-     * 创建Saga事务
-     *
-     * @return
-     */
-    public Saga newSaga() {
-        return new Saga();
-    }
-    
     
     /**
      * 生成全局事务id
@@ -100,6 +72,19 @@ public class DtmClient {
             throw new Exception(message.toString());
         }
         return jsonObject.get("gid").toString();
+    }
+    
+    /**
+     * tcc事务
+     *
+     * @param gid
+     * @param function
+     * @return
+     * @throws Exception
+     */
+    public void tccGlobalTransaction(String gid, Function<Tcc, Boolean> function) throws Exception {
+        Tcc tcc = new Tcc(ipPort, gid);
+        tcc.tccGlobalTransaction(function);
     }
     
     
