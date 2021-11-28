@@ -51,11 +51,11 @@ Maven：
 
 ```bash
 <repositories>
-		<repository>
-		    <id>jitpack.io</id>
-		    <url>https://jitpack.io</url>
-		</repository>
-	</repositories>
+	<repository>
+		<id>jitpack.io</id>
+		<url>https://jitpack.io</url>
+	</repository>
+</repositories>
 ```
 
 Gradle：
@@ -75,10 +75,10 @@ Maven：
 
 ```bash
 <dependency>
-	    <groupId>com.github.yedf</groupId>
-	    <artifactId>dtmcli-java</artifactId>
-	    <version>Tag</version>
-	</dependency>
+	<groupId>com.github.yedf</groupId>
+	<artifactId>dtmcli-java</artifactId>
+	<version>Tag</version>
+</dependency>
 ```
 
 Gradle:
