@@ -22,11 +22,13 @@
  * SOFTWARE.
  */
 
-package exception;
+package common.model;
 
-public class DtmException extends RuntimeException {
+/**
+ * @author lixiaoshuang
+ */
+@FunctionalInterface
+public interface DtmConsumer<T> {
     
-    public DtmException(String message) {
-        super(message);
-    }
+    void accept(T t) throws Exception;
 }

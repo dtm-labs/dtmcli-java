@@ -26,13 +26,13 @@ package client;
 
 
 import com.alibaba.fastjson.JSONObject;
+import common.model.DtmConsumer;
 import common.model.DtmServerInfo;
 import common.utils.HttpUtil;
 import okhttp3.Response;
 import tcc.Tcc;
 
 import java.util.Objects;
-import java.util.function.Function;
 
 /**
  * @author lixiaoshuang
@@ -82,7 +82,7 @@ public class DtmClient {
      * @return
      * @throws Exception
      */
-    public void tccGlobalTransaction(String gid, Function<Tcc, Boolean> function) throws Exception {
+    public void tccGlobalTransaction(String gid, DtmConsumer<Tcc> function) throws Exception {
         Tcc tcc = new Tcc(ipPort, gid);
         tcc.tccGlobalTransaction(function);
     }

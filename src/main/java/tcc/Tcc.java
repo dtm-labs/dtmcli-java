@@ -26,20 +26,20 @@ package tcc;
 
 import com.alibaba.fastjson.JSONObject;
 import common.constant.Constant;
+import common.model.DtmConsumer;
 import common.model.DtmServerInfo;
 import common.utils.HttpUtil;
 import common.utils.BranchIdGeneratorUtil;
 import common.constant.ParamFieldConstant;
 import common.enums.TransTypeEnum;
 import common.model.TransBase;
-import exception.DtmException;
+import exception.FailureException;
 import okhttp3.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
-import java.util.function.Function;
 
 /**
  * @author lixiaoshuang
@@ -76,22 +76,26 @@ public class Tcc {
         this.transBase = new TransBase(TransTypeEnum.TCC, gid, false);
     }
     
-    public String tccGlobalTransaction(Function<Tcc, Boolean> function) throws Exception {
+    public void tccGlobalTransaction(DtmConsumer<Tcc> consumer) throws Exception {
         HashMap<String, Object> paramMap = new HashMap<>(Constant.DEFAULT_INITIAL_CAPACITY);
         paramMap.put(ParamFieldConstant.GID, transBase.getGid());
         paramMap.put(ParamFieldConstant.TRANS_TYPE, TransTypeEnum.TCC.getValue());
-        Response post = HttpUtil.post(dtmServerInfo.prepare(), JSONObject.toJSONString(paramMap));
-        this.checkResult(post.body().string());
+        
         try {
-            if (function.apply(this)) {
-                HttpUtil.post(dtmServerInfo.submit(), JSONObject.toJSONString(paramMap));
-            } else {
-                HttpUtil.post(dtmServerInfo.abort(), JSONObject.toJSONString(paramMap));
-            }
+            Response response = HttpUtil.post(dtmServerInfo.prepare(), JSONObject.toJSONString(paramMap));
+            this.checkResult(response);
+        } catch (FailureException failureException) {
+            log.info("tccGlobalTransaction fail message:{}" + failureException.getLocalizedMessage());
+            throw failureException;
+        }
+        
+        try {
+            consumer.accept(this);
+            HttpUtil.post(dtmServerInfo.submit(), JSONObject.toJSONString(paramMap));
         } catch (Exception e) {
             HttpUtil.post(dtmServerInfo.abort(), JSONObject.toJSONString(paramMap));
+            throw e;
         }
-        return transBase.getGid();
     }
     
     public Response callBranch(Object body, String tryUrl, String confirmUrl, String cancelUrl) throws Exception {
@@ -108,14 +112,14 @@ public class Tcc {
         
         Response registerResponse = HttpUtil
                 .post(dtmServerInfo.registerTccBranch(), JSONObject.toJSONString(registerParam));
-        
-        try {
-            this.checkResult(registerResponse.body().string());
-            return HttpUtil.post(splicingTryUrl(tryUrl, transBase.getGid(), TransTypeEnum.TCC.getValue(), branchId, OP),
-                    JSONObject.toJSONString(body));
-        } catch (Exception e) {
-            throw new Exception(e);
-        }
+        this.checkResult(registerResponse);
+    
+        Response tryResponse = HttpUtil
+                .post(splicingTryUrl(tryUrl, transBase.getGid(), TransTypeEnum.TCC.getValue(), branchId, OP),
+                        JSONObject.toJSONString(body));
+        this.checkResult(tryResponse);
+    
+        return tryResponse;
     }
     
     /**
@@ -126,20 +130,17 @@ public class Tcc {
     }
     
     
-    public void checkResult(String response) {
-        if (StringUtils.isBlank(response)) {
-            throw new DtmException("response is null");
+    public void checkResult(Response response)throws Exception {
+        int errorCode = 400;
+        if (response.code() >= errorCode){
+            throw new FailureException(response.message());
         }
-        JSONObject jsonObject = JSONObject.parseObject(response);
-        Object code = jsonObject.get(ParamFieldConstant.CODE);
-        if (null != code && (int) code >= 0) {
-            log.error("server error,message:{}", jsonObject.get(ParamFieldConstant.MESSAGE));
-            throw new DtmException("server error code >0");
+        String result = response.body().string();
+        if (StringUtils.isBlank(result)) {
+            throw new FailureException("response is null");
         }
-        Object dtmResult = jsonObject.get(ParamFieldConstant.DTM_RESULT);
-        if (null == dtmResult || dtmResult.toString().equals(FAIL_RESULT)) {
-            log.error("server error,dtmResult:{}", dtmResult);
-            throw new DtmException("Service returned failed");
+        if (result.contains(FAIL_RESULT)){
+            throw new FailureException("Service returned failed");
         }
     }
 }
