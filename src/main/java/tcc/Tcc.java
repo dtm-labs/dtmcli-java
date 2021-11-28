@@ -26,6 +26,7 @@ package tcc;
 
 import com.alibaba.fastjson.JSONObject;
 import common.constant.Constant;
+import common.model.DtmConsumer;
 import common.model.DtmServerInfo;
 import common.utils.HttpUtil;
 import common.utils.BranchIdGeneratorUtil;
@@ -39,7 +40,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
-import java.util.function.Consumer;
 
 /**
  * @author lixiaoshuang
@@ -76,14 +76,14 @@ public class Tcc {
         this.transBase = new TransBase(TransTypeEnum.TCC, gid, false);
     }
     
-    public void tccGlobalTransaction(Consumer<Tcc> consumer) throws Exception {
+    public void tccGlobalTransaction(DtmConsumer<Tcc> consumer) throws Exception {
         HashMap<String, Object> paramMap = new HashMap<>(Constant.DEFAULT_INITIAL_CAPACITY);
         paramMap.put(ParamFieldConstant.GID, transBase.getGid());
         paramMap.put(ParamFieldConstant.TRANS_TYPE, TransTypeEnum.TCC.getValue());
         
         try {
-            Response post = HttpUtil.post(dtmServerInfo.prepare(), JSONObject.toJSONString(paramMap));
-            this.checkResult(post.body().string());
+            Response response = HttpUtil.post(dtmServerInfo.prepare(), JSONObject.toJSONString(paramMap));
+            this.checkResult(response);
         } catch (FailureException failureException) {
             log.info("tccGlobalTransaction fail message:{}" + failureException.getLocalizedMessage());
             throw failureException;
@@ -110,15 +110,16 @@ public class Tcc {
         registerParam.put(ParamFieldConstant.CONFIRM, confirmUrl);
         registerParam.put(ParamFieldConstant.CANCEL, cancelUrl);
         
-        try {
-            Response registerResponse = HttpUtil
-                    .post(dtmServerInfo.registerTccBranch(), JSONObject.toJSONString(registerParam));
-            this.checkResult(registerResponse.body().string());
-        } catch (FailureException e) {
-            throw e;
-        }
-        return HttpUtil.post(splicingTryUrl(tryUrl, transBase.getGid(), TransTypeEnum.TCC.getValue(), branchId, OP),
-                JSONObject.toJSONString(body));
+        Response registerResponse = HttpUtil
+                .post(dtmServerInfo.registerTccBranch(), JSONObject.toJSONString(registerParam));
+        this.checkResult(registerResponse);
+    
+        Response tryResponse = HttpUtil
+                .post(splicingTryUrl(tryUrl, transBase.getGid(), TransTypeEnum.TCC.getValue(), branchId, OP),
+                        JSONObject.toJSONString(body));
+        this.checkResult(tryResponse);
+    
+        return tryResponse;
     }
     
     /**
@@ -129,19 +130,16 @@ public class Tcc {
     }
     
     
-    public void checkResult(String response) {
-        if (StringUtils.isBlank(response)) {
+    public void checkResult(Response response)throws Exception {
+        int errorCode = 400;
+        if (response.code() >= errorCode){
+            throw new FailureException(response.message());
+        }
+        String result = response.body().string();
+        if (StringUtils.isBlank(result)) {
             throw new FailureException("response is null");
         }
-        JSONObject jsonObject = JSONObject.parseObject(response);
-        Object code = jsonObject.get(ParamFieldConstant.CODE);
-        if (null != code && (int) code >= 0) {
-            log.error("server error,message:{}", jsonObject.get(ParamFieldConstant.MESSAGE));
-            throw new FailureException("server error code >0");
-        }
-        Object dtmResult = jsonObject.get(ParamFieldConstant.DTM_RESULT);
-        if (null == dtmResult || dtmResult.toString().equals(FAIL_RESULT)) {
-            log.error("server error,dtmResult:{}", dtmResult);
+        if (result.contains(FAIL_RESULT)){
             throw new FailureException("Service returned failed");
         }
     }

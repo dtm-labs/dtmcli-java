@@ -26,6 +26,7 @@ package barrier;
 
 import com.alibaba.fastjson.JSONObject;
 import common.constant.ParamFieldConstant;
+import common.model.DtmConsumer;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 /**
  * @author lixiaoshuang
@@ -98,7 +98,7 @@ public class BranchBarrier {
      * @return
      * @throws SQLException
      */
-    public void call(Connection connection, Consumer<BranchBarrier> consumer) throws SQLException {
+    public void call(Connection connection, DtmConsumer<BranchBarrier> consumer) throws Exception {
         this.barrierId++;
         connection.setAutoCommit(false);
         try {
@@ -110,6 +110,7 @@ public class BranchBarrier {
         } catch (Exception exception) {
             log.warn("barrier call error", exception);
             connection.rollback();
+            throw exception;
         } finally {
             connection.setAutoCommit(true);
         }

@@ -22,11 +22,13 @@
  * SOFTWARE.
  */
 
-package exception;
+package common.model;
 
-public class FailureException extends Exception {
+/**
+ * @author lixiaoshuang
+ */
+@FunctionalInterface
+public interface DtmConsumer<T> {
     
-    public FailureException(String message) {
-        super(message);
-    }
+    void accept(T t) throws Exception;
 }
