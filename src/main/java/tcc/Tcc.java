@@ -38,7 +38,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
@@ -77,18 +76,25 @@ public class Tcc {
         this.transBase = new TransBase(TransTypeEnum.TCC, gid, false);
     }
     
-    public void tccGlobalTransaction(Consumer<Tcc> consumer) throws IOException {
+    public void tccGlobalTransaction(Consumer<Tcc> consumer) throws Exception {
         HashMap<String, Object> paramMap = new HashMap<>(Constant.DEFAULT_INITIAL_CAPACITY);
         paramMap.put(ParamFieldConstant.GID, transBase.getGid());
         paramMap.put(ParamFieldConstant.TRANS_TYPE, TransTypeEnum.TCC.getValue());
+        
         try {
             Response post = HttpUtil.post(dtmServerInfo.prepare(), JSONObject.toJSONString(paramMap));
             this.checkResult(post.body().string());
-            consumer.accept(this);
-            HttpUtil.post(dtmServerInfo.submit(), JSONObject.toJSONString(paramMap));
         } catch (FailureException failureException) {
             log.info("tccGlobalTransaction fail message:{}" + failureException.getLocalizedMessage());
+            throw failureException;
+        }
+        
+        try {
+            consumer.accept(this);
+            HttpUtil.post(dtmServerInfo.submit(), JSONObject.toJSONString(paramMap));
+        } catch (Exception e) {
             HttpUtil.post(dtmServerInfo.abort(), JSONObject.toJSONString(paramMap));
+            throw e;
         }
     }
     
@@ -103,7 +109,7 @@ public class Tcc {
         registerParam.put(ParamFieldConstant.TRY, tryUrl);
         registerParam.put(ParamFieldConstant.CONFIRM, confirmUrl);
         registerParam.put(ParamFieldConstant.CANCEL, cancelUrl);
-    
+        
         try {
             Response registerResponse = HttpUtil
                     .post(dtmServerInfo.registerTccBranch(), JSONObject.toJSONString(registerParam));

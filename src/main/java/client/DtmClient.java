@@ -83,7 +83,7 @@ public class DtmClient {
      * @return
      * @throws Exception
      */
-    public void tccGlobalTransaction(String gid, Consumer<Tcc> function) throws IOException {
+    public void tccGlobalTransaction(String gid, Consumer<Tcc> function) throws Exception {
         Tcc tcc = new Tcc(ipPort, gid);
         tcc.tccGlobalTransaction(function);
     }
