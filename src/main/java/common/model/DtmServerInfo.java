@@ -27,6 +27,9 @@ package common.model;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * @author lixiaoshuang
+ */
 @Data
 @NoArgsConstructor
 public class DtmServerInfo {

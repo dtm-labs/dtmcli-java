@@ -24,6 +24,9 @@
 
 package common.constant;
 
+/**
+ * @author lixiaoshuang
+ */
 public class Constant {
     
     public static final int DEFAULT_INITIAL_CAPACITY = 16;

@@ -24,6 +24,9 @@
 
 package common.constant;
 
+/**
+ * @author lixiaoshuang
+ */
 public class ParamFieldConstant {
     
     public static final String GID = "gid";

@@ -26,6 +26,9 @@ package common.utils;
 
 import lombok.Data;
 
+/**
+ * @author lixiaoshuang
+ */
 @Data
 public class BranchIdGeneratorUtil {
 

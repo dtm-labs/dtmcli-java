@@ -31,9 +31,11 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import java.io.IOException;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @author lixiaoshuang
+ */
 public class HttpUtil {
     
     private static final OkHttpClient CLIENT = new OkHttpClient.Builder().connectTimeout(15, TimeUnit.SECONDS)
