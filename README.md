@@ -3,7 +3,7 @@
 
 a client for distributed transaction manager [dtm](https://github.com/yedf/dtm)
 
-`dtmcli` 是分布式事务管理器 [dtm](https://github.com/yedf/dtm) 的客户端sdk
+`dtmcli-java` 是分布式事务管理器 [dtm](https://github.com/yedf/dtm) 的Java客户端sdk
 
 ## dtm分布式事务管理服务
 
@@ -43,50 +43,83 @@ DTM是一款跨语言的开源分布式事务管理器，优雅的解决了幂�
 从上面对比的特性来看，如果您的语言栈包含了Java之外的语言，那么dtm是您的首选。如果您的语言栈是Java，您也可以选择接入dtm，使用子事务屏障技术，简化您的业务编写。
 
 
-### 安装
+## 使用方式
 
-```
-$ git chole https://github.com/yedf/dtmcli-java
-$ cd dtmlcli-java
-$ mvn install
+### 步骤一：JitPack 存储库添加到您的构建文件
+
+Maven：
+
+```bash
+<repositories>
+		<repository>
+		    <id>jitpack.io</id>
+		    <url>https://jitpack.io</url>
+		</repository>
+	</repositories>
 ```
 
-### 引入
+Gradle：
 
+```bash
+allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
 ```
+
+### 步骤二：添加依赖项
+
+Maven：
+
+```bash
 <dependency>
-    <groupId>com.github.viticis</groupId>
-    <artifactId>dtmcli-java</artifactId>
-    <version>1.0-SNAPSHOT</version>
-</dependency>
+	    <groupId>com.github.yedf</groupId>
+	    <artifactId>dtmcli-java</artifactId>
+	    <version>Tag</version>
+	</dependency>
 ```
 
-### 使用
+Gradle:
 
-```java
-/*...*/
+```bash
+dependencies {
+	        implementation 'com.github.yedf:dtmcli-java:Tag'
+	}
+```
 
-import tcc.Tcc;
+## 示例
 
-public class TccController {
-
-  public String fireTcc() {
-    Function<Tcc, Boolean> function = TccController::tccTrans;
-    return tcc.tccGlobalTransaction(function);
-  }
-
-  public static Boolean tccTrans(Tcc tcc) {
-    try {
-      boolean a = tcc.callBranch("", svc + "/TransOutTry", svc + "/TransOutConfirm", svc + "/TransOutCancel");
-      boolean b = tcc.callBranch("", svc + "/TransInTry", svc + "/TransInConfirm", svc + "/TransInCancel");
-      return a && b;
-    } catch (Exception e) {
-      e.printStackTrace();
+```bash
+@RequestMapping("testTcc")
+    public String testTcc() {
+        //创建dtm clinet
+        DtmClient dtmClient = new DtmClient(ipPort);
+        //创建tcc事务
+        try {
+            dtmClient.tccGlobalTransaction(dtmClient.genGid(), TccTestController::tccTrans);
+        } catch (Exception e) {
+            log.error("tccGlobalTransaction error", e);
+            return "fail";
+        }
+        return "success";
     }
-    return false;
-  }
-}
-/*...*/
+
+/**
+     * 定义tcc事务函数，内部需要通过callBranch注册事务子分支
+     *
+     * @param tcc
+     * @return
+     * @see TransController
+     */
+    public static void tccTrans(Tcc tcc) throws Exception {
+        Response outResponse = tcc
+                .callBranch("", svc + "/TransOutTry", svc + "/TransOutConfirm", svc + "/TransOutCancel");
+        log.info("outResponse:{}", outResponse);
+        Response inResponse = tcc.callBranch("", svc + "/TransInTry", svc + "/TransInConfirm", svc + "/TransInCancel");
+        log.info("inResponse:{}", inResponse);
+    }
 ```
 
 
