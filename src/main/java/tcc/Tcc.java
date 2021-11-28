@@ -103,17 +103,16 @@ public class Tcc {
         registerParam.put(ParamFieldConstant.TRY, tryUrl);
         registerParam.put(ParamFieldConstant.CONFIRM, confirmUrl);
         registerParam.put(ParamFieldConstant.CANCEL, cancelUrl);
-        
-        Response registerResponse = HttpUtil
-                .post(dtmServerInfo.registerTccBranch(), JSONObject.toJSONString(registerParam));
-        
+    
         try {
+            Response registerResponse = HttpUtil
+                    .post(dtmServerInfo.registerTccBranch(), JSONObject.toJSONString(registerParam));
             this.checkResult(registerResponse.body().string());
-            return HttpUtil.post(splicingTryUrl(tryUrl, transBase.getGid(), TransTypeEnum.TCC.getValue(), branchId, OP),
-                    JSONObject.toJSONString(body));
-        } catch (Exception e) {
-            throw new Exception(e);
+        } catch (FailureException e) {
+            throw e;
         }
+        return HttpUtil.post(splicingTryUrl(tryUrl, transBase.getGid(), TransTypeEnum.TCC.getValue(), branchId, OP),
+                JSONObject.toJSONString(body));
     }
     
     /**
