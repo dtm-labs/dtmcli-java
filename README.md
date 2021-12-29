@@ -1,9 +1,9 @@
 # dtmcli ![MIT License][license-badge]
 
 
-a client for distributed transaction manager [dtm](https://github.com/yedf/dtm)
+a client for distributed transaction manager [dtm](https://github.com/dtm-labs/dtm)
 
-`dtmcli-java` 是分布式事务管理器 [dtm](https://github.com/yedf/dtm) 的Java客户端sdk
+`dtmcli-java` 是分布式事务管理器 [dtm](https://github.com/dtm-labs/dtm) 的Java客户端sdk
 
 ## dtm分布式事务管理服务
 
@@ -38,7 +38,7 @@ DTM是一款跨语言的开源分布式事务管理器，优雅的解决了幂�
 | SAGA事务 |<span style="color:orange">简单模式</span> |<span style="color:green">状态机复杂模式</span> |dtm的状态机模式在规划中|
 |事务消息|<span style="color:green">✓</span>|<span style="color:red">✗</span>|dtm提供类似rocketmq的事务消息|
 |通信协议|HTTP|dubbo等协议，无HTTP|dtm后续将支持grpc类协议|
-|star数量|<img src="https://img.shields.io/github/stars/yedf/dtm.svg?style=social" alt="github stars"/>|<img src="https://img.shields.io/github/stars/seata/seata.svg?style=social" alt="github stars"/>|dtm从20210604发布0.1，发展快|
+|star数量|<img src="https://img.shields.io/github/stars/dtm-labs/dtm.svg?style=social" alt="github stars"/>|<img src="https://img.shields.io/github/stars/seata/seata.svg?style=social" alt="github stars"/>|dtm从20210604发布0.1，发展快|
 
 从上面对比的特性来看，如果您的语言栈包含了Java之外的语言，那么dtm是您的首选。如果您的语言栈是Java，您也可以选择接入dtm，使用子事务屏障技术，简化您的业务编写。
 
@@ -125,10 +125,10 @@ dependencies {
 
 ### 完整示例
 
-[dtmcli-java-sample](https://github.com/yedf/dtmcli-java-sample)
+[dtmcli-java-sample](https://github.com/dtm-labs/dtmcli-java-sample)
 
 ### License
 
-[MIT](https://github.com/yedf/dtmcli/blob/master/LICENSE)
+[MIT](https://github.com/dtm-labs/dtmcli/blob/master/LICENSE)
 
-[license-badge]:   https://img.shields.io/github/license/yedf/dtmcli-py
+[license-badge]:   https://img.shields.io/github/license/dtm-labs/dtmcli-py
