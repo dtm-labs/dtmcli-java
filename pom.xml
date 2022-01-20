@@ -16,7 +16,7 @@
         <okhttp.version>4.9.1</okhttp.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <slf4j-api.version>1.7.30</slf4j-api.version>
-        <mysql-connector-java.version>8.0.26</mysql-connector-java.version>
+        <mysql-connector-java.version>8.0.27</mysql-connector-java.version>
     </properties>
     
     <dependencies>
