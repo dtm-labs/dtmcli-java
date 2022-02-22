@@ -26,16 +26,16 @@ package common.enums;
 
 public enum TransTypeEnum {
     // 事务类型
-    TCC("tcc");
-    
+    TCC("tcc"), SAGA("saga");
+
     TransTypeEnum(String value) {
         this.value = value;
     }
-    
+
     private String value;
-    
+
     public String getValue() {
         return this.value;
     }
-    
+
 }
