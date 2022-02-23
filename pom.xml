@@ -6,7 +6,7 @@
     
     <groupId>pub.dtm</groupId>
     <artifactId>dtmcli-java</artifactId>
-    <version>1.5.4-SNAPSHOT</version>
+    <version>1.5.5-SNAPSHOT</version>
     
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -17,6 +17,7 @@
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <slf4j-api.version>1.7.30</slf4j-api.version>
         <mysql-connector-java.version>8.0.27</mysql-connector-java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     
     <dependencies>
