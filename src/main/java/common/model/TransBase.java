@@ -28,23 +28,40 @@ import common.enums.TransTypeEnum;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 @Data
 @NoArgsConstructor
 public class TransBase {
-    
+
     /**
      * 全局事务id
      */
     private String gid;
-    
+
     /**
      * 事务类型
      */
     private TransTypeEnum transTypeEnum;
-    
-    
+
     private boolean waitResult;
-    
+
+    private long timeoutToFail;
+
+    private long retryInterval;
+
+    private Map<String, String> branchHeaders = new HashMap<>();
+
+    private ArrayList<String> passthroughHeaders = new ArrayList<>();
+
+    private String customData;
+
+    private ArrayList<Map<String, String>> steps = new ArrayList<>();
+
+    private ArrayList<String> payloads = new ArrayList<>();
+
     public TransBase(TransTypeEnum transTypeEnum, String gid, boolean waitResult) {
         this.gid = gid;
         this.transTypeEnum = transTypeEnum;

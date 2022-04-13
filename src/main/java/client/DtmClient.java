@@ -30,6 +30,7 @@ import common.model.DtmConsumer;
 import common.model.DtmServerInfo;
 import common.utils.HttpUtil;
 import okhttp3.Response;
+import saga.Saga;
 import tcc.Tcc;
 
 import java.util.Objects;
@@ -38,13 +39,13 @@ import java.util.Objects;
  * @author lixiaoshuang
  */
 public class DtmClient {
-    
+
     private String ipPort;
-    
+
     public DtmClient(String ipPort) {
         this.ipPort = ipPort;
     }
-    
+
     /**
      * 生成全局事务id
      *
@@ -73,7 +74,7 @@ public class DtmClient {
         }
         return jsonObject.get("gid").toString();
     }
-    
+
     /**
      * tcc事务
      *
@@ -86,6 +87,13 @@ public class DtmClient {
         Tcc tcc = new Tcc(ipPort, gid);
         tcc.tccGlobalTransaction(function);
     }
-    
-    
+
+    /**
+     * create a new saga
+     * @param gid
+     */
+    public Saga newSaga(String gid) {
+        Saga saga = new Saga(ipPort, gid);
+        return saga;
+    }
 }
