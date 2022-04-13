@@ -93,7 +93,6 @@ public class DtmClient {
      * @param gid
      */
     public Saga newSaga(String gid) {
-        Saga saga = new Saga(ipPort, gid);
-        return saga;
+        return new Saga(ipPort, gid);
     }
 }
