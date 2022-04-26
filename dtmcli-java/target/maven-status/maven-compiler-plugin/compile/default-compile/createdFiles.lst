@@ -1,5 +1,5 @@
-feign/DtmFeignClient.class
-feign/URIParser.class
-utils/NacosUtils.class
-properties/DtmProperties.class
-client/DtmClient.class
+pub/dtm/client/utils/NacosUtils.class
+pub/dtm/client/feign/DtmFeignClient.class
+pub/dtm/client/feign/URIParser.class
+pub/dtm/client/DtmClient.class
+pub/dtm/client/properties/DtmProperties.class

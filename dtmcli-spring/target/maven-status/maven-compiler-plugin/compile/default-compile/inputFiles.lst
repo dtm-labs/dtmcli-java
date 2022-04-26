@@ -1,5 +1,5 @@
-/Users/horse/ideaProjects/dtmcli-java-parent/dtmcli-spring/src/main/java/feign/URIParser.java
-/Users/horse/ideaProjects/dtmcli-java-parent/dtmcli-spring/src/main/java/client/DtmClient.java
-/Users/horse/ideaProjects/dtmcli-java-parent/dtmcli-spring/src/main/java/configuration/DtmConfiguration.java
-/Users/horse/ideaProjects/dtmcli-java-parent/dtmcli-spring/src/main/java/feign/DtmFeignClient.java
-/Users/horse/ideaProjects/dtmcli-java-parent/dtmcli-spring/src/main/java/properties/DtmProperties.java
+/Users/horse/ideaProjects/dtmcli-java-parent/dtmcli-spring/src/main/java/pub/dtm/client/properties/DtmProperties.java
+/Users/horse/ideaProjects/dtmcli-java-parent/dtmcli-spring/src/main/java/pub/dtm/client/feign/URIParser.java
+/Users/horse/ideaProjects/dtmcli-java-parent/dtmcli-spring/src/main/java/pub/dtm/client/DtmClient.java
+/Users/horse/ideaProjects/dtmcli-java-parent/dtmcli-spring/src/main/java/pub/dtm/client/configuration/DtmConfiguration.java
+/Users/horse/ideaProjects/dtmcli-java-parent/dtmcli-spring/src/main/java/pub/dtm/client/feign/DtmFeignClient.java

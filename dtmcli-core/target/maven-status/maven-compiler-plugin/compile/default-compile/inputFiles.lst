@@ -1,6 +1,4 @@
-/Users/horse/ideaProjects/dtmcli-java-parent/dtmcli-core/src/main/java/barrier/model/BarrierParam.java
-/Users/horse/ideaProjects/dtmcli-java-parent/dtmcli-core/src/main/java/tcc/model/Tcc.java
-/Users/horse/ideaProjects/dtmcli-java-parent/dtmcli-core/src/main/java/base/BranchIdGenerator.java
-/Users/horse/ideaProjects/dtmcli-java-parent/dtmcli-core/src/main/java/barrier/BranchBarrierService.java
-/Users/horse/ideaProjects/dtmcli-java-parent/dtmcli-core/src/main/java/tcc/TccService.java
-/Users/horse/ideaProjects/dtmcli-java-parent/dtmcli-core/src/main/java/barrier/model/BranchBarrier.java
+/Users/horse/ideaProjects/dtmcli-java-parent/dtmcli-core/src/main/java/pub/dtm/client/base/BranchIdGenerator.java
+/Users/horse/ideaProjects/dtmcli-java-parent/dtmcli-core/src/main/java/pub/dtm/client/barrier/BranchBarrier.java
+/Users/horse/ideaProjects/dtmcli-java-parent/dtmcli-core/src/main/java/pub/dtm/client/tcc/Tcc.java
+/Users/horse/ideaProjects/dtmcli-java-parent/dtmcli-core/src/main/java/pub/dtm/client/barrier/BarrierParam.java

@@ -1,6 +1,4 @@
-barrier/model/BarrierParam.class
-barrier/BranchBarrierService.class
-tcc/model/Tcc.class
-barrier/model/BranchBarrier.class
-tcc/TccService.class
-base/BranchIdGenerator.class
+pub/dtm/client/tcc/Tcc.class
+pub/dtm/client/barrier/BranchBarrier.class
+pub/dtm/client/barrier/BarrierParam.class
+pub/dtm/client/base/BranchIdGenerator.class
