@@ -1,0 +1,22 @@
+{
+  "groups": [
+    {
+      "name": "dtm.service",
+      "type": "properties.DtmProperties",
+      "sourceType": "properties.DtmProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "dtm.service.name",
+      "type": "java.lang.String",
+      "sourceType": "properties.DtmProperties"
+    },
+    {
+      "name": "dtm.service.registry-type",
+      "type": "java.lang.String",
+      "sourceType": "properties.DtmProperties"
+    }
+  ],
+  "hints": []
+}

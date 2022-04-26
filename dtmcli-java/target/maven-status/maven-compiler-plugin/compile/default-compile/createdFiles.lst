@@ -1,0 +1,5 @@
+feign/DtmFeignClient.class
+feign/URIParser.class
+utils/NacosUtils.class
+properties/DtmProperties.class
+client/DtmClient.class

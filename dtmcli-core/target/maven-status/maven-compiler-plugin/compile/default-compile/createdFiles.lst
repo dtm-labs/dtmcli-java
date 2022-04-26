@@ -1,0 +1,6 @@
+barrier/model/BarrierParam.class
+barrier/BranchBarrierService.class
+tcc/model/Tcc.class
+barrier/model/BranchBarrier.class
+tcc/TccService.class
+base/BranchIdGenerator.class

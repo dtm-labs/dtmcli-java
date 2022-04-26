@@ -1,0 +1,14 @@
+interfaces/dtm/IDtmService.class
+constant/ParamFieldConstants.class
+model/feign/ServiceMessage.class
+interfaces/feign/IURIParser.class
+interfaces/dtm/DtmConsumer.class
+constant/Constants.class
+model/param/OperatorParam.class
+interfaces/feign/IDtmFeignClient.class
+utils/FeignUtils.class
+model/dtm/TransBase.class
+utils/HttpUtils.class
+model/response/ResponseBase.class
+enums/TransTypeEnum.class
+exception/DtmException.class

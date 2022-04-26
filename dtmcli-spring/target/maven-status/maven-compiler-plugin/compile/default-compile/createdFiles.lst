@@ -1,0 +1,6 @@
+feign/URIParser.class
+META-INF/spring-configuration-metadata.json
+properties/DtmProperties.class
+client/DtmClient.class
+feign/DtmFeignClient.class
+configuration/DtmConfiguration.class
