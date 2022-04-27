@@ -3,7 +3,7 @@ package pub.dtm.client.barrier;
 import com.google.gson.Gson;
 import pub.dtm.client.constant.ParamFieldConstants;
 import pub.dtm.client.enums.TransTypeEnum;
-import pub.dtm.client.exception.DtmException;
+import pub.dtm.client.exception.FailureException;
 import pub.dtm.client.interfaces.dtm.DtmConsumer;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,7 +31,7 @@ public class BranchBarrier extends TransBase {
 
     public BranchBarrier(Map<String, String[]> paramsMap) throws Exception {
         if (paramsMap == null || paramsMap.isEmpty()) {
-            throw new DtmException("build BranchBarrier error, paramsMap can not be empty.");
+            throw new FailureException("build BranchBarrier error, paramsMap can not be empty.");
         }
         Gson gson = new Gson();
         BarrierParam barrierParam = gson.fromJson(gson.toJson(paramsMap), BarrierParam.class);

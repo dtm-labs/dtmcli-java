@@ -5,7 +5,7 @@ import com.google.gson.Gson;
 import pub.dtm.client.constant.Constants;
 import pub.dtm.client.constant.ParamFieldConstants;
 import pub.dtm.client.enums.TransTypeEnum;
-import pub.dtm.client.exception.DtmException;
+import pub.dtm.client.exception.FailureException;
 import pub.dtm.client.interfaces.dtm.DtmConsumer;
 import pub.dtm.client.interfaces.feign.IDtmFeignClient;
 import pub.dtm.client.model.dtm.TransBase;
@@ -53,7 +53,7 @@ public class Tcc extends TransBase {
         log.info("prepare response: {}", resp);
         if (!Constants.SUCCESS_RESULT.equals(resp.getDtmResult())) {
             log.error("TCC transaction prepare fail. returned dtm_result is: {}, transaction gid: {}", resp.getDtmResult(), this.getGid());
-            throw new DtmException("TCC Transaction prepare fail");
+            throw new FailureException("TCC Transaction prepare fail");
         }
         try {
             consumer.accept(this);
@@ -61,7 +61,7 @@ public class Tcc extends TransBase {
         } catch (Exception e) {
             log.error("TCC transaction submit fail, start abort it. transaction gid: {}", this.getGid());
             feignClient.abort(operatorParam);
-            throw new DtmException(e);
+            throw new FailureException(e);
         }
         return this.getGid();
     }
@@ -77,7 +77,7 @@ public class Tcc extends TransBase {
         DtmResponse resp = feignClient.registerBranch(operatorParam);
         if (!Constants.SUCCESS_RESULT.equals(resp.getDtmResult())) {
             log.error("TCC transaction register branch fail. transaction gid: {}",  this.getGid());
-            throw new DtmException("TCC Transaction register branch fail");
+            throw new FailureException("TCC Transaction register branch fail");
         }
 
         Map<String, Object> paramsMap = new HashMap<>();
@@ -103,7 +103,7 @@ public class Tcc extends TransBase {
         DtmResponse resp = feignClient.registerBranch(operatorParam);
         if (!Constants.SUCCESS_RESULT.equals(resp.getDtmResult())) {
             log.error("TCC transaction register branch fail. transaction gid: {}",  this.getGid());
-            throw new DtmException("TCC Transaction register branch fail");
+            throw new FailureException("TCC Transaction register branch fail");
         }
 
         Map<String, String> paramsMap = new HashMap<>();

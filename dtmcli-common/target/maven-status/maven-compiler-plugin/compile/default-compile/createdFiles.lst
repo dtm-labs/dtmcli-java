@@ -5,9 +5,9 @@ pub/dtm/client/utils/FeignUtils.class
 pub/dtm/client/model/param/OperatorParam.class
 pub/dtm/client/enums/TransTypeEnum.class
 pub/dtm/client/model/dtm/TransBase.class
+pub/dtm/client/exception/FailureException.class
 pub/dtm/client/model/feign/ServiceMessage.class
 pub/dtm/client/interfaces/dtm/DtmConsumer.class
 pub/dtm/client/constant/Constants.class
 pub/dtm/client/interfaces/feign/IDtmFeignClient.class
-pub/dtm/client/exception/DtmException.class
 pub/dtm/client/interfaces/feign/IURIParser.class

@@ -1,7 +1,7 @@
 package pub.dtm.client.utils;
 
 import pub.dtm.client.constant.Constants;
-import pub.dtm.client.exception.DtmException;
+import pub.dtm.client.exception.FailureException;
 import feign.Response;
 import pub.dtm.client.interfaces.feign.IURIParser;
 import pub.dtm.client.model.feign.ServiceMessage;
@@ -35,16 +35,16 @@ public class FeignUtils {
         return uriParser.generatorURI(serviceMessage, httpType);
     }
 
-    public static void checkResult(Response response) throws DtmException {
+    public static void checkResult(Response response) throws FailureException {
         if (response.status() >= Constants.RESP_ERR_CODE){
             if (response.reason() != null) {
-                throw new DtmException(response.reason());
+                throw new FailureException(response.reason());
             }
             try {
                 log.error("response code is {}, but unknown reason, response body is {}", response.status(),
                         IOUtils.toString(response.body().asReader(StandardCharsets.UTF_8)));
             } finally {
-                throw new DtmException("response code is " + response.status());
+                throw new FailureException("response code is " + response.status());
             }
         }
         String result = "";
@@ -54,13 +54,13 @@ public class FeignUtils {
                 result = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
             }
         } catch (IOException e) {
-            throw new DtmException("response is null");
+            throw new FailureException("response is null");
         }
         if (StringUtils.isBlank(result)) {
-            throw new DtmException("response is null");
+            throw new FailureException("response is null");
         }
         if (result.contains(Constants.FAILURE_RESULT)){
-            throw new DtmException("Service returned failed");
+            throw new FailureException("Service returned failed");
         }
     }
 }

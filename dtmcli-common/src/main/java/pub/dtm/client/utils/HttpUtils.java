@@ -1,7 +1,7 @@
 package pub.dtm.client.utils;
 
 import pub.dtm.client.constant.Constants;
-import pub.dtm.client.exception.DtmException;
+import pub.dtm.client.exception.FailureException;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -49,15 +49,15 @@ public class HttpUtils {
 
     public static void checkResult(Response response) throws Exception {
         if (response.code() >= Constants.RESP_ERR_CODE){
-            throw new DtmException(response.message());
+            throw new FailureException(response.message());
         }
         ResponseBody body = response.body();
         String result;
         if (body == null || StringUtils.isBlank(result = body.string())) {
-            throw new DtmException("response is null");
+            throw new FailureException("response is null");
         }
         if (result.contains(Constants.FAILURE_RESULT)){
-            throw new DtmException("Service returned failed");
+            throw new FailureException("Service returned failed");
         }
     }
 }
