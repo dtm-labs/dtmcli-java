@@ -1,4 +1,0 @@
-pub/dtm/client/tcc/Tcc.class
-pub/dtm/client/barrier/BranchBarrier.class
-pub/dtm/client/barrier/BarrierParam.class
-pub/dtm/client/base/BranchIdGenerator.class
