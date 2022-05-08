@@ -22,40 +22,30 @@
  * SOFTWARE.
  */
 
-package pub.dtm.client.properties;
+package pub.dtm.client.utils;
 
-import java.io.FileInputStream;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.IOException;
-import java.util.Properties;
 
-public class DtmProperties {
-    private static Properties dtmProperties;
+/**
+ * Json Utils
+ *
+ * @author horseLk
+ */
+public class JsonUtils {
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    private static void loadNacosProperties() throws IOException {
-        Properties properties = new Properties();
-        FileInputStream in = new FileInputStream(DtmProperties.class.getResource("/dtm-conf.properties").getPath());
-        properties.load(in);
-        dtmProperties = properties;
+    public static <T> T parseJson(String json, Class<T> clzz) throws JsonProcessingException {
+        return objectMapper.readValue(json, clzz);
     }
 
-    public static String get(String key) throws IOException {
-        if (dtmProperties == null) {
-            loadNacosProperties();
-        }
-        return dtmProperties.getProperty(key);
+    public static <T> T parseJson(byte[] bytes, Class<T> clzz) throws IOException {
+        return objectMapper.readValue(bytes, clzz);
     }
 
-    public static String getOrDefault(String key, String defaultValue) throws IOException {
-        if (dtmProperties == null) {
-            loadNacosProperties();
-        }
-        return dtmProperties.getProperty(key, defaultValue);
-    }
-
-    public static Properties getNacosProperties() throws IOException {
-        if (dtmProperties == null) {
-            loadNacosProperties();
-        }
-        return dtmProperties;
+    public static String toJson(Object object) throws JsonProcessingException {
+        return objectMapper.writeValueAsString(object);
     }
 }

@@ -22,68 +22,60 @@
  * SOFTWARE.
  */
 
-package pub.dtm.client.model.feign;
+package pub.dtm.client.model.param;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
+import pub.dtm.client.constant.ParamFieldConstants;
+import pub.dtm.client.enums.TransTypeEnum;
 
 /**
- * Service message for micro service
- *
+ * Tcc Operator Param
  * @author horseLk
  */
 @Data
 @NoArgsConstructor
-public class ServiceMessage {
+public class TccOperatorParam extends OperatorParam {
     /**
-     * service name
+     * branch id
      */
-    private String serviceName;
-
-    /**
-     * group name
-     */
-    private String groupName = "DEFAULT_GROUP";
+    @JsonProperty(ParamFieldConstants.BRANCH_ID)
+    private String branchId;
 
     /**
-     * clusters
+     * status
      */
-    private List<String> cluster = new ArrayList<>();
+    @JsonProperty(ParamFieldConstants.STATUS)
+    private String status;
 
     /**
-     * request path
+     * data
      */
-    private String path;
+    @JsonProperty(ParamFieldConstants.DATA)
+    private String data;
 
-    public ServiceMessage(String serviceName, String path){
-        this.serviceName = serviceName;
-        this.path = path;
-    }
+    /**
+     * branch confirm uri
+     */
+    @JsonProperty(ParamFieldConstants.CONFIRM)
+    private String confirm;
 
-    public ServiceMessage(String serviceName, String groupName, List<String> cluster, String path) {
-        this.serviceName = serviceName;
-        this.groupName = groupName;
-        this.cluster.addAll(cluster);
-        this.path = path;
-    }
+    /**
+     * branch cancel uri
+     */
+    @JsonProperty(ParamFieldConstants.CANCEL)
+    private String cancel;
 
-    public String getPath() {
-        if (StringUtils.startsWith(path, "/")) {
-            return path;
-        }
-        return "/" + path;
-    }
 
-    @Override
-    public String toString() {
-        String _path = path;
-        if (!StringUtils.startsWith(path, "/")) {
-            _path = "/" + path;
-        }
-        return serviceName + _path + "?groupName=" + groupName;
+    public TccOperatorParam(String gid, TransTypeEnum transTypeEnum, String branchId, String status, String data,
+                            String confirm, String cancel) {
+        super(gid, transTypeEnum);
+        setSubType(transTypeEnum.getValue());
+        this.branchId = branchId;
+        this.status = status;
+        this.data = data;
+        this.confirm = confirm;
+        this.cancel = cancel;
     }
 }

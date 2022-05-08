@@ -22,40 +22,42 @@
  * SOFTWARE.
  */
 
-package pub.dtm.client.properties;
+package pub.dtm.client.log;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Properties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class DtmProperties {
-    private static Properties dtmProperties;
+/**
+ * Custom feign logger for print detail feign log
+ *
+ * @author horseLk
+ */
+public class DtmFeignLogger extends feign.Logger {
+    private final Logger logger;
 
-    private static void loadNacosProperties() throws IOException {
-        Properties properties = new Properties();
-        FileInputStream in = new FileInputStream(DtmProperties.class.getResource("/dtm-conf.properties").getPath());
-        properties.load(in);
-        dtmProperties = properties;
+    public DtmFeignLogger() {
+        this(feign.Logger.class);
     }
 
-    public static String get(String key) throws IOException {
-        if (dtmProperties == null) {
-            loadNacosProperties();
-        }
-        return dtmProperties.getProperty(key);
+    public DtmFeignLogger(Class<?> clazz) {
+        this(LoggerFactory.getLogger(clazz));
     }
 
-    public static String getOrDefault(String key, String defaultValue) throws IOException {
-        if (dtmProperties == null) {
-            loadNacosProperties();
-        }
-        return dtmProperties.getProperty(key, defaultValue);
+    public DtmFeignLogger(String name) {
+        this(LoggerFactory.getLogger(name));
     }
 
-    public static Properties getNacosProperties() throws IOException {
-        if (dtmProperties == null) {
-            loadNacosProperties();
+    DtmFeignLogger(Logger logger) {
+        this.logger = logger;
+    }
+
+    @Override
+    protected void log(String configKey, String format, Object... args) {
+        // Not using SLF4J's support for parameterized messages (even though it
+        // would be more efficient) because it would
+        // require the incoming message formats to be SLF4J-specific.
+        if (logger.isInfoEnabled()) {
+            logger.info(String.format(methodTag(configKey) + format, args));
         }
-        return dtmProperties;
     }
 }
