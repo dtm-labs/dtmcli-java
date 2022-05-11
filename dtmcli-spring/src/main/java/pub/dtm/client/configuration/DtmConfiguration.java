@@ -25,6 +25,7 @@
 package pub.dtm.client.configuration;
 
 import feign.Logger;
+import pub.dtm.client.DtmClient;
 import pub.dtm.client.feign.URIParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

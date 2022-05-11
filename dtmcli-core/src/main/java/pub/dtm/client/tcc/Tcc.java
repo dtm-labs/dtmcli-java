@@ -30,8 +30,8 @@ import pub.dtm.client.constant.Constants;
 import pub.dtm.client.constant.ParamFieldConstants;
 import pub.dtm.client.enums.TransTypeEnum;
 import pub.dtm.client.exception.FailureException;
+import pub.dtm.client.interfaces.ICommunicationStub;
 import pub.dtm.client.interfaces.dtm.DtmConsumer;
-import pub.dtm.client.interfaces.feign.IDtmFeignClient;
 import pub.dtm.client.model.dtm.TransBase;
 import pub.dtm.client.model.feign.ServiceMessage;
 import okhttp3.Response;
@@ -68,16 +68,16 @@ public class Tcc extends TransBase {
     /**
      * feign client
      */
-    private IDtmFeignClient feignClient;
+    private ICommunicationStub communicationStub;
 
-    public Tcc(String gid, IDtmFeignClient feignClient) {
+    public Tcc(String gid, ICommunicationStub communicationStub) {
         super(gid, TransTypeEnum.TCC, false);
         this.branchIdGenerator = new BranchIdGenerator(Constants.EMPTY_STRING);
-        this.feignClient = feignClient;
+        this.communicationStub = communicationStub;
     }
 
-    public void setFeignClient(IDtmFeignClient feignClient) {
-        this.feignClient = feignClient;
+    public void setCommunicationStub(ICommunicationStub communicationStub) {
+        this.communicationStub = communicationStub;
     }
 
     /**
@@ -89,12 +89,12 @@ public class Tcc extends TransBase {
     public String tccGlobalTransaction(DtmConsumer<Tcc> consumer) throws Exception {
         // if tcc's gid is empty, need to request a new gid from dtm svr
         if (StringUtils.isEmpty(this.getGid())) {
-            this.setGid(FeignUtils.parseGid(feignClient.newGid()));
+            this.setGid(FeignUtils.parseGid(communicationStub.newGid()));
         }
         log.info("the tcc transaction's gid is {}", this.getGid());
 
         OperatorParam operatorParam = new OperatorParam(this.getGid(), TransTypeEnum.TCC);
-        DtmResponse resp = feignClient.prepare(operatorParam);
+        DtmResponse resp = communicationStub.prepare(operatorParam);
         log.info("prepare response: {}", resp);
         if (!Constants.SUCCESS_RESULT.equals(resp.getDtmResult())) {
             log.error("TCC transaction prepare fail. returned dtm_result is: {}, transaction gid: {}", resp.getDtmResult(), this.getGid());
@@ -102,10 +102,10 @@ public class Tcc extends TransBase {
         }
         try {
             consumer.accept(this);
-            feignClient.submit(operatorParam);
+            communicationStub.submit(operatorParam);
         } catch (Exception e) {
             log.error("TCC transaction submit fail, start abort it. transaction gid: {}", this.getGid());
-            feignClient.abort(operatorParam);
+            communicationStub.abort(operatorParam);
             throw new FailureException(e);
         }
         return this.getGid();
@@ -128,7 +128,7 @@ public class Tcc extends TransBase {
 
         TccOperatorParam operatorParam = new TccOperatorParam(this.getGid(), TransTypeEnum.TCC, branchId, Constants.DEFAULT_STATUS,
                 JsonUtils.toJson(body), FeignUtils.generatorURI(confirmMessage, false), FeignUtils.generatorURI(cancelMessage, false));
-        DtmResponse resp = feignClient.registerBranch(operatorParam);
+        DtmResponse resp = communicationStub.registerBranch(operatorParam);
         if (!Constants.SUCCESS_RESULT.equals(resp.getDtmResult())) {
             log.error("TCC transaction register branch fail. transaction gid: {}",  this.getGid());
             throw new FailureException("TCC Transaction register branch fail");
@@ -140,7 +140,7 @@ public class Tcc extends TransBase {
         paramsMap.put(ParamFieldConstants.BRANCH_ID, branchId);
         paramsMap.put(ParamFieldConstants.OP, OP);
 
-        feign.Response response = feignClient.busiPost(new URI(FeignUtils.generatorURI(tryMessage, true)),
+        feign.Response response = communicationStub.busiPost(new URI(FeignUtils.generatorURI(tryMessage, true)),
                 tryMessage.getPath(), paramsMap, body);
         log.info("busi post is: {}", response);
         FeignUtils.checkResult(response);
@@ -163,7 +163,7 @@ public class Tcc extends TransBase {
 
         TccOperatorParam operatorParam = new TccOperatorParam(this.getGid(), TransTypeEnum.TCC, branchId, Constants.DEFAULT_STATUS,
                 JsonUtils.toJson(body), confirmUrl, cancelUrl);
-        DtmResponse resp = feignClient.registerBranch(operatorParam);
+        DtmResponse resp = communicationStub.registerBranch(operatorParam);
         if (!Constants.SUCCESS_RESULT.equals(resp.getDtmResult())) {
             log.error("TCC transaction register branch fail. transaction gid: {}",  this.getGid());
             throw new FailureException("TCC Transaction register branch fail");

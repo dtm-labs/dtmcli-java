@@ -64,14 +64,15 @@ public enum TransTypeEnum {
         return this.value;
     }
 
-    private static Map<String, TransTypeEnum> exist = new HashMap<>();
+    private static final Map<String, TransTypeEnum> EXIST = new HashMap<>();
+
+    static {
+        for (TransTypeEnum transType : TransTypeEnum.values()) {
+            EXIST.put(transType.value, transType);
+        }
+    }
 
     public static TransTypeEnum parseString(String value) {
-        if (exist.isEmpty()) {
-            for (TransTypeEnum transType : TransTypeEnum.values()) {
-                exist.put(transType.value, transType);
-            }
-        }
-        return exist.get(value);
+        return EXIST.get(value);
     }
 }

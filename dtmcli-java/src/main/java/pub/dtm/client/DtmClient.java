@@ -31,6 +31,7 @@ import pub.dtm.client.constant.Constants;
 import pub.dtm.client.feign.DtmFeignClient;
 import feign.Feign;
 import pub.dtm.client.feign.URIParser;
+import pub.dtm.client.interfaces.ICommunicationStub;
 import pub.dtm.client.interfaces.dtm.DtmConsumer;
 import pub.dtm.client.interfaces.feign.IDtmFeignClient;
 import org.apache.commons.lang3.StringUtils;
@@ -54,7 +55,7 @@ import static com.alibaba.nacos.api.naming.CommonParams.GROUP_NAME;
 public class DtmClient {
     private static final Logger log = LoggerFactory.getLogger(DtmClient.class);
 
-    private IDtmFeignClient feignClient;
+    private ICommunicationStub communicationStub;
 
     public DtmClient() {
         // init URIParser
@@ -91,7 +92,7 @@ public class DtmClient {
             System.exit(-1);
         }
 
-        this.feignClient = feignClient;
+        this.communicationStub = feignClient;
     }
 
     public DtmClient(String endpoint) {
@@ -116,7 +117,7 @@ public class DtmClient {
             System.exit(-1);
         }
 
-        this.feignClient = feignClient;
+        this.communicationStub = feignClient;
     }
 
     private List<String> genClusters(String clusterStr) {
@@ -136,7 +137,7 @@ public class DtmClient {
      * @throws Exception exception
      */
     public String tccGlobalTransaction(DtmConsumer<Tcc> function) throws Exception {
-        Tcc tcc = new Tcc(null, feignClient);
+        Tcc tcc = new Tcc(null, communicationStub);
         return tcc.tccGlobalTransaction(function);
     }
 
@@ -148,7 +149,7 @@ public class DtmClient {
      * @throws Exception exception
      */
     public String tccGlobalTransaction(String gid, DtmConsumer<Tcc> function) throws Exception {
-        Tcc tcc = new Tcc(gid, feignClient);
+        Tcc tcc = new Tcc(gid, communicationStub);
         return tcc.tccGlobalTransaction(function);
     }
 
@@ -158,7 +159,7 @@ public class DtmClient {
      * @return Saga
      */
     public Saga newSaga(String gid) {
-        return new Saga(gid, feignClient);
+        return new Saga(gid, communicationStub);
     }
 
     /**
@@ -166,6 +167,6 @@ public class DtmClient {
      * @return Saga
      */
     public Saga newSaga() {
-        return new Saga(null, feignClient);
+        return new Saga(null, communicationStub);
     }
 }

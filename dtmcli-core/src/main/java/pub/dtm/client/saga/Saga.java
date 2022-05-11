@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 import pub.dtm.client.constant.ParamFieldConstants;
 import pub.dtm.client.enums.TransTypeEnum;
 import pub.dtm.client.exception.FailureException;
-import pub.dtm.client.interfaces.feign.IDtmFeignClient;
+import pub.dtm.client.interfaces.ICommunicationStub;
 import pub.dtm.client.model.dtm.TransBase;
 import pub.dtm.client.model.feign.ServiceMessage;
 import pub.dtm.client.model.param.SagaOperatorParam;
@@ -58,7 +58,7 @@ public class Saga extends TransBase {
 
     private static final String CONCURRENT = "concurrent";
 
-    private IDtmFeignClient feignClient;
+    private ICommunicationStub communicationStub;
 
     private boolean concurrent;
 
@@ -78,11 +78,11 @@ public class Saga extends TransBase {
 
     private List<String> payloads = new ArrayList<>();
 
-    public Saga(String gid, IDtmFeignClient feignClient) {
+    public Saga(String gid, ICommunicationStub communicationStub) {
         super(gid, TransTypeEnum.SAGA, false);
         this.concurrent = false;
         this.orders = new HashMap<>();
-        this.feignClient = feignClient;
+        this.communicationStub = communicationStub;
     }
 
     public Saga add(ServiceMessage action, ServiceMessage compensate, Object postData) {
@@ -114,7 +114,7 @@ public class Saga extends TransBase {
 
     public String submit() throws Exception {
         if (StringUtils.isEmpty(this.getGid())) {
-            this.setGid(FeignUtils.parseGid(feignClient.newGid()));
+            this.setGid(FeignUtils.parseGid(communicationStub.newGid()));
         }
         addConcurrentContext();
         SagaOperatorParam operatorParam = new SagaOperatorParam(this.getGid(), TransTypeEnum.SAGA, this.getSteps(),
@@ -122,7 +122,7 @@ public class Saga extends TransBase {
                 this.getRetryInterval(), this.getPassthroughHeaders(), this.getBranchHeaders());
 
         try {
-            feignClient.submit(operatorParam);
+            communicationStub.submit(operatorParam);
         } catch (Exception e) {
             log.error("saga transaction submit failed, transaction gid is {}", this.getGid());
             throw new FailureException(e);
