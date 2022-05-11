@@ -22,22 +22,28 @@
  * SOFTWARE.
  */
 
-package pub.dtm.client.interfaces.feign;
+package pub.dtm.client.communication;
 
+import com.alibaba.nacos.api.naming.pojo.Instance;
+import pub.dtm.client.constant.Constants;
+import pub.dtm.client.interfaces.communication.IURIParser;
 import pub.dtm.client.model.feign.ServiceMessage;
+import pub.dtm.client.properties.DtmProperties;
+import pub.dtm.client.utils.FeignUtils;
+import pub.dtm.client.utils.NacosUtils;
 
-/**
- * URI Parser interface
- *
- * @author horseLk
- */
-public interface IURIParser {
-    /**
-     * according to serviceMessage and connection driver generate uri
-     * @param serviceMessage service message
-     * @param httpType true means http, false means microservice
-     * @return uri
-     * @throws Exception exception
-     */
-    String generatorURI(ServiceMessage serviceMessage, boolean httpType) throws Exception;
+public class URIParser implements IURIParser {
+    static {
+        FeignUtils.setUriParser(new URIParser());
+    }
+
+    @Override
+    public String generatorURI(ServiceMessage serviceMessage, boolean httpType) throws Exception {
+        if (httpType) {
+            Instance instance = NacosUtils.selectOneHealthyInstance(serviceMessage.getServiceName(),
+                    serviceMessage.getGroupName(), serviceMessage.getCluster());
+            return Constants.HTTP_PREFIX + instance.toInetAddr();
+        }
+        return DtmProperties.get("dtm.service.registryType") + "://" + serviceMessage.toString();
+    }
 }

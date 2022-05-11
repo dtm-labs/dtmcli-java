@@ -28,16 +28,14 @@ import com.alibaba.nacos.api.naming.pojo.Instance;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import pub.dtm.client.constant.Constants;
-import pub.dtm.client.feign.DtmFeignClient;
+import pub.dtm.client.communication.DtmFeignClient;
 import feign.Feign;
-import pub.dtm.client.feign.URIParser;
-import pub.dtm.client.interfaces.ICommunicationStub;
+import pub.dtm.client.communication.URIParser;
 import pub.dtm.client.interfaces.dtm.DtmConsumer;
-import pub.dtm.client.interfaces.feign.IDtmFeignClient;
+import pub.dtm.client.interfaces.communication.IDtmCommunicationClient;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pub.dtm.client.log.DtmFeignLogger;
 import pub.dtm.client.properties.DtmProperties;
 import pub.dtm.client.saga.Saga;
 import pub.dtm.client.tcc.Tcc;
@@ -55,7 +53,7 @@ import static com.alibaba.nacos.api.naming.CommonParams.GROUP_NAME;
 public class DtmClient {
     private static final Logger log = LoggerFactory.getLogger(DtmClient.class);
 
-    private ICommunicationStub communicationStub;
+    private IDtmCommunicationClient dtmCommunicationClient;
 
     public DtmClient() {
         // init URIParser
@@ -79,7 +77,7 @@ public class DtmClient {
             log.error("can not resolve dtm server message from config file, you can use nacos or redirect configure to config it.");
             System.exit(-1);
         }
-        IDtmFeignClient feignClient = Feign
+        IDtmCommunicationClient feignClient = Feign
                                     .builder()
                                     .decoder(new JacksonDecoder())
                                     .encoder(new JacksonEncoder())
@@ -92,7 +90,7 @@ public class DtmClient {
             System.exit(-1);
         }
 
-        this.communicationStub = feignClient;
+        this.dtmCommunicationClient = feignClient;
     }
 
     public DtmClient(String endpoint) {
@@ -103,7 +101,7 @@ public class DtmClient {
             log.error("dtm server endpoint can not be empty.");
             System.exit(-1);
         }
-        IDtmFeignClient feignClient = Feign
+        IDtmCommunicationClient feignClient = Feign
                 .builder()
                 .decoder(new JacksonDecoder())
                 .encoder(new JacksonEncoder())
@@ -117,7 +115,7 @@ public class DtmClient {
             System.exit(-1);
         }
 
-        this.communicationStub = feignClient;
+        this.dtmCommunicationClient = feignClient;
     }
 
     private List<String> genClusters(String clusterStr) {
@@ -137,7 +135,7 @@ public class DtmClient {
      * @throws Exception exception
      */
     public String tccGlobalTransaction(DtmConsumer<Tcc> function) throws Exception {
-        Tcc tcc = new Tcc(null, communicationStub);
+        Tcc tcc = new Tcc(null, dtmCommunicationClient);
         return tcc.tccGlobalTransaction(function);
     }
 
@@ -149,7 +147,7 @@ public class DtmClient {
      * @throws Exception exception
      */
     public String tccGlobalTransaction(String gid, DtmConsumer<Tcc> function) throws Exception {
-        Tcc tcc = new Tcc(gid, communicationStub);
+        Tcc tcc = new Tcc(gid, dtmCommunicationClient);
         return tcc.tccGlobalTransaction(function);
     }
 
@@ -159,7 +157,7 @@ public class DtmClient {
      * @return Saga
      */
     public Saga newSaga(String gid) {
-        return new Saga(gid, communicationStub);
+        return new Saga(gid, dtmCommunicationClient);
     }
 
     /**
@@ -167,6 +165,6 @@ public class DtmClient {
      * @return Saga
      */
     public Saga newSaga() {
-        return new Saga(null, communicationStub);
+        return new Saga(null, dtmCommunicationClient);
     }
 }

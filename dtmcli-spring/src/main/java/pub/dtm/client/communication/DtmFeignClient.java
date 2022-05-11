@@ -22,11 +22,11 @@
  * SOFTWARE.
  */
 
-package pub.dtm.client.feign;
+package pub.dtm.client.communication;
 
 import pub.dtm.client.constant.Constants;
 import feign.Response;
-import pub.dtm.client.interfaces.feign.IDtmFeignClient;
+import pub.dtm.client.interfaces.communication.IDtmCommunicationClient;
 import pub.dtm.client.model.param.OperatorParam;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.SpringQueryMap;
@@ -41,7 +41,12 @@ import java.net.URI;
 import java.util.Map;
 
 @FeignClient(value = "${dtm.service.name}")
-public interface DtmFeignClient extends IDtmFeignClient {
+public interface DtmFeignClient extends IDtmCommunicationClient {
+    @Override
+    default String stubType() {
+        return "feign-spring";
+    }
+
     @Override
     @GetMapping(Constants.NEW_GID_URL)
     DtmResponse newGid();

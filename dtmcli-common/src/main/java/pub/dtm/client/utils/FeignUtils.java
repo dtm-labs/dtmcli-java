@@ -27,7 +27,7 @@ package pub.dtm.client.utils;
 import pub.dtm.client.constant.Constants;
 import pub.dtm.client.exception.FailureException;
 import feign.Response;
-import pub.dtm.client.interfaces.feign.IURIParser;
+import pub.dtm.client.interfaces.communication.IURIParser;
 import pub.dtm.client.model.feign.ServiceMessage;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;

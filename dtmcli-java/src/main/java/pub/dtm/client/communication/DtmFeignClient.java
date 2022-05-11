@@ -22,75 +22,57 @@
  * SOFTWARE.
  */
 
-package pub.dtm.client.interfaces;
+package pub.dtm.client.communication;
 
+import feign.Headers;
+import feign.Param;
+import feign.QueryMap;
+import feign.RequestLine;
 import feign.Response;
+import pub.dtm.client.constant.Constants;
+import pub.dtm.client.interfaces.communication.IDtmCommunicationClient;
 import pub.dtm.client.model.param.OperatorParam;
 import pub.dtm.client.model.responses.DtmResponse;
 
 import java.net.URI;
 import java.util.Map;
 
-/**
- * Base stub to communication with server.
- *
- * @author horseLk
- */
-public interface ICommunicationStub {
-    /**
-     * get stubType
-     * @return type
-     */
-    String stubType();
+@Headers("Content-Type: application/json")
+public interface DtmFeignClient extends IDtmCommunicationClient {
+    @Override
+    default String stubType() {
+        return "open-feign";
+    }
 
-    /**
-     * get a new gid
-     */
+    @Override
+    @RequestLine(Constants.GET_METHOD + Constants.NEW_GID_URL)
     DtmResponse newGid();
 
-    /**
-     * test connection
-     */
+    @Override
+    @RequestLine(Constants.GET_METHOD + Constants.PING_URL)
     DtmResponse ping();
 
-    /**
-     * prepare
-     * @param body prepare body
-     */
+    @Override
+    @RequestLine(Constants.POST_METHOD + Constants.PREPARE_URL)
     DtmResponse prepare(OperatorParam body);
 
-    /**
-     * submit
-     * @param body submit bosy
-     */
+    @Override
+    @RequestLine(Constants.POST_METHOD + Constants.SUBMIT_URL)
     DtmResponse submit(OperatorParam body);
 
-    /**
-     * abort
-     * @param body abort body
-     */
+    @Override
+    @RequestLine(Constants.POST_METHOD + Constants.ABORT_URL)
     DtmResponse abort(OperatorParam body);
 
-    /**
-     * registerBranch
-     * @param body registerBranch body
-     */
+    @Override
+    @RequestLine(Constants.POST_METHOD + Constants.REGISTER_BRANCH_URL)
     DtmResponse registerBranch(OperatorParam body);
 
-    /**
-     * use feign send busi get request
-     * @param host busi host
-     * @param path busi path
-     * @param queryMap querymao
-     */
-    Response busiGet(URI host, String path, Map<String, Object> queryMap);
+    @Override
+    @RequestLine(Constants.GET_METHOD + "{path}")
+    Response busiGet(URI host, @Param("path") String path, @QueryMap Map<String, Object> queryMap);
 
-    /**
-     * use feign send busi post request
-     * @param host busi host
-     * @param path busi path
-     * @param queryMap query map
-     * @param body request body
-     */
-    Response busiPost(URI host, String path, Map<String, Object> queryMap, Object body);
+    @Override
+    @RequestLine(Constants.POST_METHOD + "{path}")
+    Response busiPost(URI host, @Param("path") String path, @QueryMap Map<String, Object> queryMap, Object body);
 }

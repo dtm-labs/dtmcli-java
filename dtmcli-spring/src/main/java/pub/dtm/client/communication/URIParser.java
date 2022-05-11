@@ -22,10 +22,10 @@
  * SOFTWARE.
  */
 
-package pub.dtm.client.feign;
+package pub.dtm.client.communication;
 
 import pub.dtm.client.constant.Constants;
-import pub.dtm.client.interfaces.feign.IURIParser;
+import pub.dtm.client.interfaces.communication.IURIParser;
 import pub.dtm.client.model.feign.ServiceMessage;
 import pub.dtm.client.utils.FeignUtils;
 
