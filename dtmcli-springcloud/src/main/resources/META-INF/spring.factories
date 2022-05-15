@@ -1,0 +1,1 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=pub.dtm.client.springcloud.configuration.DtmConfiguration

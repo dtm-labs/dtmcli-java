@@ -22,12 +22,12 @@
  * SOFTWARE.
  */
 
-package pub.dtm.client;
+package pub.dtm.client.springcloud;
 
-import pub.dtm.client.interfaces.communication.IDtmCommunicationClient;
-import pub.dtm.client.interfaces.dtm.DtmConsumer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import pub.dtm.client.interfaces.communication.IDtmCommunicationClient;
+import pub.dtm.client.interfaces.dtm.DtmConsumer;
 import pub.dtm.client.saga.Saga;
 import pub.dtm.client.tcc.Tcc;
 
@@ -35,10 +35,6 @@ import pub.dtm.client.tcc.Tcc;
 public class DtmClient {
     @Autowired
     private IDtmCommunicationClient dtmCommunicationClient;
-
-    public DtmClient(IDtmCommunicationClient dtmCommunicationClient) {
-        this.dtmCommunicationClient = dtmCommunicationClient;
-    }
 
     /**
      * start a tcc transaction without gid, client send a request to dtm svr for obtain a new gid.

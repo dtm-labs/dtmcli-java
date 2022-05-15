@@ -22,12 +22,9 @@
  * SOFTWARE.
  */
 
-package pub.dtm.client.communication;
+package pub.dtm.client.springcloud.communication;
 
-import pub.dtm.client.constant.Constants;
 import feign.Response;
-import pub.dtm.client.interfaces.communication.IDtmCommunicationClient;
-import pub.dtm.client.model.param.OperatorParam;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.http.MediaType;
@@ -35,6 +32,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import pub.dtm.client.constant.Constants;
+import pub.dtm.client.interfaces.communication.IDtmCommunicationClient;
+import pub.dtm.client.model.param.OperatorParam;
 import pub.dtm.client.model.responses.DtmResponse;
 
 import java.net.URI;

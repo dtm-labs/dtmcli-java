@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package pub.dtm.client.communication;
+package pub.dtm.client.springcloud.communication;
 
 import pub.dtm.client.constant.Constants;
 import pub.dtm.client.interfaces.communication.IURIParser;
