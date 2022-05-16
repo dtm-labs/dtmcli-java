@@ -18,9 +18,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-<!--        <cloud.feign.version>3.1.1</cloud.feign.version>-->
-<!--        <cloud.nacos.version>2021.0.1.0</cloud.nacos.version>-->
-<!--        <cloud.loadbalancer.version>2.1.2.RELEASE</cloud.loadbalancer.version>-->
+
         <spring-cloud.version>2021.0.1</spring-cloud.version>
         <alibaba-cloud.version>2021.0.1.0</alibaba-cloud.version>
         <springboot.version>2.6.3</springboot.version>
@@ -55,7 +53,6 @@
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
-<!--            <version>${cloud.nacos.version}</version>-->
             <!--不使用Ribbon 进行客户端负载均衡-->
             <exclusions>
                 <exclusion>
@@ -72,12 +69,10 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
-<!--            <version>${cloud.feign.version}</version>-->
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-loadbalancer</artifactId>
-<!--            <version>${cloud.loadbalancer.version}</version>-->
         </dependency>
     </dependencies>
 

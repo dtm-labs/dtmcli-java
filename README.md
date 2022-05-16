@@ -45,29 +45,18 @@ DTM是一款跨语言的开源分布式事务管理器，优雅的解决了幂�
 
 ## 使用方式
 
-### 步骤一：JitPack 存储库添加到您的构建文件
+### 步骤一：确定你需要使用的版本
+1. 您的项目是springcloud项目
+- 您的项目中springboot版本>=2.4.0，请选择dtmcli-springcloud相应的版本直接接入即可
+- 您的项目中的springboot版本<2.4.0，请选择dtmcli-java接入，dtmcli-java也提供了微服务相关的接口，请设置nacos服务中心的相关配置即可使用
+2. 您的项目是普通项目/没有接入微服务的spring(boot)项目
+- 请选择dtmcli-java，并设置相应的配置即可
 
-Maven：
-
-```bash
-<repositories>
-	<repository>
-		<id>jitpack.io</id>
-		<url>https://jitpack.io</url>
-	</repository>
-</repositories>
-```
-
-Gradle：
-
-```bash
-allprojects {
-		repositories {
-			...
-			maven { url 'https://jitpack.io' }
-		}
-	}
-```
+|  artifact| version | 适用版本 |备注|
+|:-----:|:----:|:----:|:----:|
+|dtmcli-springcloud| 2.1.x| 2.6.0 <= springboot version < 2.6.latest| |
+|dtmcli-springcloud| 2.1.x| 2.4.0 <= springboot version < 2.5.13| springboot 版本>=2.5.0，需要设置spring.cloud.compatibility-verifier.enabled=false|
+|dtmcli-java| 2.1.x| others| |
 
 ### 步骤二：添加依赖项
 
@@ -75,9 +64,9 @@ Maven：
 
 ```bash
 <dependency>
-	<groupId>com.github.yedf</groupId>
-	<artifactId>dtmcli-java</artifactId>
-	<version>Tag</version>
+	<groupId>io.github.dtm-labs</groupId>
+	<artifactId>dtmcli-springcloud</artifactId>
+	<version>${dtmcli.version}</version>
 </dependency>
 ```
 
@@ -85,10 +74,25 @@ Gradle:
 
 ```bash
 dependencies {
-	        implementation 'com.github.yedf:dtmcli-java:Tag'
+	        implementation 'io.github.dtm-labs:dtmcli-springcloud:${dtmcli.version}'
 	}
 ```
 
+### 步骤三：设置dtmcli-java配置
+如果您引入了dtmcli-java，则需要新建一个`dtm-conf.properties`配置文件
+- 情形一：您引入了nacos等服务中心组件的配置文件
+```
+serverAddr=127.0.0.1:8848
+username=nacos
+password=nacos
+namespace=c3dc917d-906a-429d-90a9-85012b41014e
+dtm.service.name=dtmService
+dtm.service.registryType=nacos
+```
+- 情形二：您直连dtmsvr
+```
+dtm.ipport=127.0.0.1:36789
+```
 ## 示例
 
 ```bash
