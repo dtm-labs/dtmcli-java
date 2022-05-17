@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package pub.dtm.client.springcloud.properties;
+package pub.dtm.client.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

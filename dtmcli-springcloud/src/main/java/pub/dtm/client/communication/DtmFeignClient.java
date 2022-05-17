@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package pub.dtm.client.springcloud.communication;
+package pub.dtm.client.communication;
 
 import feign.Response;
 import org.springframework.cloud.openfeign.FeignClient;

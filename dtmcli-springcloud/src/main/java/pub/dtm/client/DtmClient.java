@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package pub.dtm.client.springcloud;
+package pub.dtm.client;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

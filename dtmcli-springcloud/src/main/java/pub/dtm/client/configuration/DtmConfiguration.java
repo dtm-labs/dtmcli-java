@@ -22,9 +22,10 @@
  * SOFTWARE.
  */
 
-package pub.dtm.client.springcloud.configuration;
+package pub.dtm.client.configuration;
 
-import pub.dtm.client.springcloud.communication.URIParser;
+import pub.dtm.client.communication.URIParser;
+import pub.dtm.client.properties.DtmProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -33,12 +34,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
-import pub.dtm.client.springcloud.properties.DtmProperties;
 
 @Component
 @ComponentScan({"pub.dtm.client"})
 @Configuration
-@EnableFeignClients("pub.dtm.client.springcloud.communication")
+@EnableFeignClients("pub.dtm.client.communication")
 @EnableConfigurationProperties(DtmProperties.class)
 public class DtmConfiguration {
     @Autowired
