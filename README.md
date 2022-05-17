@@ -131,7 +131,7 @@ dtm.ipport=127.0.0.1:36789
 
 #### dtmcli-java使用示例
 [dtmcli-java-sample](https://github.com/dtm-labs/dtmcli-java-sample)
-[dtmcli-java-sample-use-configuration](https://github.com/horseLk/dtmcli-java-conf)
+[dtmcli-java-sample-use-configuration](https://github.com/horseLk/dtmcli-java-sample-with-conf)
 #### dtmcli-springcloud使用示例
 [dtmcli-java-spring-sample](https://github.com/dtm-labs/dtmcli-java-spring-sample)
 
