@@ -24,28 +24,24 @@
 
 package pub.dtm.client;
 
-import pub.dtm.client.interfaces.ICommunicationStub;
-import pub.dtm.client.interfaces.dtm.DtmConsumer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import pub.dtm.client.interfaces.communication.IDtmCommunicationClient;
+import pub.dtm.client.interfaces.dtm.DtmConsumer;
 import pub.dtm.client.saga.Saga;
 import pub.dtm.client.tcc.Tcc;
 
 @Component
 public class DtmClient {
     @Autowired
-    private ICommunicationStub communicationStub;
-
-    public DtmClient(ICommunicationStub communicationStub) {
-        this.communicationStub = communicationStub;
-    }
+    private IDtmCommunicationClient dtmCommunicationClient;
 
     /**
      * start a tcc transaction without gid, client send a request to dtm svr for obtain a new gid.
      * @return gid
      */
     public String tccGlobalTransaction(DtmConsumer<Tcc> function) throws Exception {
-        Tcc tcc = new Tcc(null, communicationStub);
+        Tcc tcc = new Tcc(null, dtmCommunicationClient);
         return tcc.tccGlobalTransaction(function);
     }
 
@@ -55,7 +51,7 @@ public class DtmClient {
      * @return gid
      */
     public String tccGlobalTransaction(String gid, DtmConsumer<Tcc> function) throws Exception {
-        Tcc tcc = new Tcc(gid, communicationStub);
+        Tcc tcc = new Tcc(gid, dtmCommunicationClient);
         return tcc.tccGlobalTransaction(function);
     }
 
@@ -65,7 +61,7 @@ public class DtmClient {
      * @return Saga
      */
     public Saga newSaga(String gid) {
-        return new Saga(gid, communicationStub);
+        return new Saga(gid, dtmCommunicationClient);
     }
 
     /**
@@ -73,6 +69,6 @@ public class DtmClient {
      * @return Saga
      */
     public Saga newSaga() {
-        return new Saga(null, communicationStub);
+        return new Saga(null, dtmCommunicationClient);
     }
 }
