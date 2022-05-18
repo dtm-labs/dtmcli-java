@@ -18,6 +18,8 @@
         <module>dtmcli-core</module>
         <module>dtmcli-springcloud</module>
         <module>dtmcli-java</module>
+        <module>nacos-plugin</module>
+        <module>eureka-plugin</module>
     </modules>
 
     <properties>
