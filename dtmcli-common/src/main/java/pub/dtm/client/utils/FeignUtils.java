@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2022 yedf
+ * Copyright (c) 2022 dtm-labs
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,7 @@ package pub.dtm.client.utils;
 import pub.dtm.client.constant.Constants;
 import pub.dtm.client.exception.FailureException;
 import feign.Response;
-import pub.dtm.client.interfaces.communication.IURIParser;
+import pub.dtm.client.interfaces.stub.IURIParser;
 import pub.dtm.client.model.feign.ServiceMessage;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;

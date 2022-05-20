@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2022 yedf
+ * Copyright (c) 2022 dtm-labs
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +31,11 @@ import pub.dtm.client.properties.DtmProperties;
 
 import java.util.List;
 
+/**
+ * Nacos utils
+ *
+ * @author horse
+ */
 public class NacosUtils {
     private static NamingService namingService;
 

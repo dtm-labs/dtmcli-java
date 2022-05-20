@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2022 yedf
+ * Copyright (c) 2022 dtm-labs
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,11 +28,11 @@ import com.alibaba.nacos.api.naming.pojo.Instance;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import pub.dtm.client.constant.Constants;
-import pub.dtm.client.communication.DtmFeignClient;
+import pub.dtm.client.stub.DtmFeignClient;
 import feign.Feign;
-import pub.dtm.client.communication.URIParser;
+import pub.dtm.client.stub.URIParser;
 import pub.dtm.client.interfaces.dtm.DtmConsumer;
-import pub.dtm.client.interfaces.communication.IDtmCommunicationClient;
+import pub.dtm.client.interfaces.stub.IDtmServerStub;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +53,7 @@ import static com.alibaba.nacos.api.naming.CommonParams.GROUP_NAME;
 public class DtmClient {
     private static final Logger log = LoggerFactory.getLogger(DtmClient.class);
 
-    private IDtmCommunicationClient dtmCommunicationClient;
+    private IDtmServerStub dtmServerStub;
 
     public DtmClient() {
         // init URIParser
@@ -77,7 +77,7 @@ public class DtmClient {
             log.error("can not resolve dtm server message from config file, you can use nacos or redirect configure to config it.");
             System.exit(-1);
         }
-        IDtmCommunicationClient feignClient = Feign
+        IDtmServerStub feignClient = Feign
                                     .builder()
                                     .decoder(new JacksonDecoder())
                                     .encoder(new JacksonEncoder())
@@ -90,7 +90,7 @@ public class DtmClient {
             System.exit(-1);
         }
 
-        this.dtmCommunicationClient = feignClient;
+        this.dtmServerStub = feignClient;
     }
 
     public DtmClient(String endpoint) {
@@ -101,7 +101,7 @@ public class DtmClient {
             log.error("dtm server endpoint can not be empty.");
             System.exit(-1);
         }
-        IDtmCommunicationClient feignClient = Feign
+        IDtmServerStub feignClient = Feign
                 .builder()
                 .decoder(new JacksonDecoder())
                 .encoder(new JacksonEncoder())
@@ -115,7 +115,7 @@ public class DtmClient {
             System.exit(-1);
         }
 
-        this.dtmCommunicationClient = feignClient;
+        this.dtmServerStub = feignClient;
     }
 
     private List<String> genClusters(String clusterStr) {
@@ -135,7 +135,7 @@ public class DtmClient {
      * @throws Exception exception
      */
     public String tccGlobalTransaction(DtmConsumer<Tcc> function) throws Exception {
-        Tcc tcc = new Tcc(null, dtmCommunicationClient);
+        Tcc tcc = new Tcc(null, dtmServerStub);
         return tcc.tccGlobalTransaction(function);
     }
 
@@ -147,7 +147,7 @@ public class DtmClient {
      * @throws Exception exception
      */
     public String tccGlobalTransaction(String gid, DtmConsumer<Tcc> function) throws Exception {
-        Tcc tcc = new Tcc(gid, dtmCommunicationClient);
+        Tcc tcc = new Tcc(gid, dtmServerStub);
         return tcc.tccGlobalTransaction(function);
     }
 
@@ -157,7 +157,7 @@ public class DtmClient {
      * @return Saga
      */
     public Saga newSaga(String gid) {
-        return new Saga(gid, dtmCommunicationClient);
+        return new Saga(gid, dtmServerStub);
     }
 
     /**
@@ -165,6 +165,6 @@ public class DtmClient {
      * @return Saga
      */
     public Saga newSaga() {
-        return new Saga(null, dtmCommunicationClient);
+        return new Saga(null, dtmServerStub);
     }
 }

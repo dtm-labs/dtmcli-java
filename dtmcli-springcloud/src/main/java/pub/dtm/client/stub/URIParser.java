@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2022 yedf
+ * Copyright (c) 2022 dtm-labs
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,13 +22,18 @@
  * SOFTWARE.
  */
 
-package pub.dtm.client.communication;
+package pub.dtm.client.stub;
 
 import pub.dtm.client.constant.Constants;
-import pub.dtm.client.interfaces.communication.IURIParser;
+import pub.dtm.client.interfaces.stub.IURIParser;
 import pub.dtm.client.model.feign.ServiceMessage;
 import pub.dtm.client.utils.FeignUtils;
 
+/**
+ * Parse url to dtm server for spring cloud client.
+ *
+ * @author horse
+ */
 public class URIParser implements IURIParser {
     static {
         FeignUtils.setUriParser(new URIParser());
