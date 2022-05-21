@@ -118,6 +118,10 @@ public class DtmClient {
         this.dtmServerStub = feignClient;
     }
 
+    public DtmClient(IDtmServerStub dtmServerStub) {
+        this.dtmServerStub = dtmServerStub;
+    }
+
     private List<String> genClusters(String clusterStr) {
         if (StringUtils.isEmpty(clusterStr)) {
             List<String> clusters = new ArrayList<>();
