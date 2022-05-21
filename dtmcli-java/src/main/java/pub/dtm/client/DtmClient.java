@@ -53,7 +53,7 @@ import static com.alibaba.nacos.api.naming.CommonParams.GROUP_NAME;
 public class DtmClient {
     private static final Logger log = LoggerFactory.getLogger(DtmClient.class);
 
-    private IDtmServerStub dtmServerStub;
+    private final IDtmServerStub dtmServerStub;
 
     public DtmClient() {
         // init URIParser
@@ -116,6 +116,10 @@ public class DtmClient {
         }
 
         this.dtmServerStub = feignClient;
+    }
+
+    public DtmClient(IDtmServerStub dtmServerStub) {
+        this.dtmServerStub = dtmServerStub;
     }
 
     private List<String> genClusters(String clusterStr) {
