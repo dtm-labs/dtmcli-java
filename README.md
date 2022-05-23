@@ -54,9 +54,9 @@ DTM是一款跨语言的开源分布式事务管理器，优雅的解决了幂�
 
 |  artifact| version | 适用版本 |备注|
 |:-----:|:----:|:----:|:----:|
-|dtmcli-springcloud| 2.1.0.1| 2.4.0 <= springboot version < 2.5.13| springboot 版本>=2.5.0，需要设置spring.cloud.compatibility-verifier.enabled=false|
-|dtmcli-springcloud| 2.1.0.2| 2.6.0 <= springboot version < 2.6.latest| |
-|dtmcli-java| 2.1.0| others| |
+|dtmcli-springcloud| 2.1.4.1| 2.4.0 <= springboot version < 2.5.13| springboot 版本>=2.5.0，需要设置spring.cloud.compatibility-verifier.enabled=false|
+|dtmcli-springcloud| 2.1.4.2| 2.6.0 <= springboot version < 2.6.latest| |
+|dtmcli-java| 2.1.4| others| |
 
 ### 步骤二：添加依赖项
 
