@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2022 yedf
+ * Copyright (c) 2022 dtm-labs
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package pub.dtm.client.communication;
+package pub.dtm.client.stub;
 
 import feign.Response;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -33,15 +33,20 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import pub.dtm.client.constant.Constants;
-import pub.dtm.client.interfaces.communication.IDtmCommunicationClient;
+import pub.dtm.client.interfaces.stub.IDtmServerStub;
 import pub.dtm.client.model.param.OperatorParam;
 import pub.dtm.client.model.responses.DtmResponse;
 
 import java.net.URI;
 import java.util.Map;
 
+/**
+ * IdtmServerStub implements for feign-spring
+ *
+ * @author horseLk
+ */
 @FeignClient(value = "${dtm.service.name}")
-public interface DtmFeignClient extends IDtmCommunicationClient {
+public interface DtmFeignClient extends IDtmServerStub {
     @Override
     default String stubType() {
         return "feign-spring";

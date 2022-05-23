@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2022 yedf
+ * Copyright (c) 2022 dtm-labs
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,22 +26,27 @@ package pub.dtm.client;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import pub.dtm.client.interfaces.communication.IDtmCommunicationClient;
+import pub.dtm.client.interfaces.stub.IDtmServerStub;
 import pub.dtm.client.interfaces.dtm.DtmConsumer;
 import pub.dtm.client.saga.Saga;
 import pub.dtm.client.tcc.Tcc;
 
+/**
+ * dtm client for spring
+ *
+ * @author horseLk
+ */
 @Component
 public class DtmClient {
     @Autowired
-    private IDtmCommunicationClient dtmCommunicationClient;
+    private IDtmServerStub dtmServerStub;
 
     /**
      * start a tcc transaction without gid, client send a request to dtm svr for obtain a new gid.
      * @return gid
      */
     public String tccGlobalTransaction(DtmConsumer<Tcc> function) throws Exception {
-        Tcc tcc = new Tcc(null, dtmCommunicationClient);
+        Tcc tcc = new Tcc(null, dtmServerStub);
         return tcc.tccGlobalTransaction(function);
     }
 
@@ -51,7 +56,7 @@ public class DtmClient {
      * @return gid
      */
     public String tccGlobalTransaction(String gid, DtmConsumer<Tcc> function) throws Exception {
-        Tcc tcc = new Tcc(gid, dtmCommunicationClient);
+        Tcc tcc = new Tcc(gid, dtmServerStub);
         return tcc.tccGlobalTransaction(function);
     }
 
@@ -61,7 +66,7 @@ public class DtmClient {
      * @return Saga
      */
     public Saga newSaga(String gid) {
-        return new Saga(gid, dtmCommunicationClient);
+        return new Saga(gid, dtmServerStub);
     }
 
     /**
@@ -69,6 +74,6 @@ public class DtmClient {
      * @return Saga
      */
     public Saga newSaga() {
-        return new Saga(null, dtmCommunicationClient);
+        return new Saga(null, dtmServerStub);
     }
 }

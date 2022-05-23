@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2022 yedf
+ * Copyright (c) 2022 dtm-labs
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@
 
 package pub.dtm.client.configuration;
 
-import pub.dtm.client.communication.URIParser;
+import pub.dtm.client.stub.URIParser;
 import pub.dtm.client.properties.DtmProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -35,10 +35,15 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
+/**
+ * Dtm client configuration
+ *
+ * @author horse
+ */
 @Component
 @ComponentScan({"pub.dtm.client"})
 @Configuration
-@EnableFeignClients("pub.dtm.client.communication")
+@EnableFeignClients("pub.dtm.client.stub")
 @EnableConfigurationProperties(DtmProperties.class)
 public class DtmConfiguration {
     @Autowired

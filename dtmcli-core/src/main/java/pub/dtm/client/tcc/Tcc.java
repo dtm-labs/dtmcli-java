@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2022 yedf
+ * Copyright (c) 2022 dtm-labs
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ import pub.dtm.client.constant.Constants;
 import pub.dtm.client.constant.ParamFieldConstants;
 import pub.dtm.client.enums.TransTypeEnum;
 import pub.dtm.client.exception.FailureException;
-import pub.dtm.client.interfaces.communication.IDtmCommunicationClient;
+import pub.dtm.client.interfaces.stub.IDtmServerStub;
 import pub.dtm.client.interfaces.dtm.DtmConsumer;
 import pub.dtm.client.model.dtm.TransBase;
 import pub.dtm.client.model.feign.ServiceMessage;
@@ -68,16 +68,16 @@ public class Tcc extends TransBase {
     /**
      * feign client
      */
-    private IDtmCommunicationClient dtmCommunicationClient;
+    private IDtmServerStub dtmServerStub;
 
-    public Tcc(String gid, IDtmCommunicationClient dtmCommunicationClient) {
+    public Tcc(String gid, IDtmServerStub dtmServerStub) {
         super(gid, TransTypeEnum.TCC, false);
         this.branchIdGenerator = new BranchIdGenerator(Constants.EMPTY_STRING);
-        this.dtmCommunicationClient = dtmCommunicationClient;
+        this.dtmServerStub = dtmServerStub;
     }
 
-    public void setdtmCommunicationClient(IDtmCommunicationClient dtmCommunicationClient) {
-        this.dtmCommunicationClient = dtmCommunicationClient;
+    public void setDtmServerStub(IDtmServerStub dtmServerStub) {
+        this.dtmServerStub = dtmServerStub;
     }
 
     /**
@@ -89,12 +89,12 @@ public class Tcc extends TransBase {
     public String tccGlobalTransaction(DtmConsumer<Tcc> consumer) throws Exception {
         // if tcc's gid is empty, need to request a new gid from dtm svr
         if (StringUtils.isEmpty(this.getGid())) {
-            this.setGid(FeignUtils.parseGid(dtmCommunicationClient.newGid()));
+            this.setGid(FeignUtils.parseGid(dtmServerStub.newGid()));
         }
         log.info("the tcc transaction's gid is {}", this.getGid());
 
         OperatorParam operatorParam = new OperatorParam(this.getGid(), TransTypeEnum.TCC);
-        DtmResponse resp = dtmCommunicationClient.prepare(operatorParam);
+        DtmResponse resp = dtmServerStub.prepare(operatorParam);
         log.info("prepare response: {}", resp);
         if (!Constants.SUCCESS_RESULT.equals(resp.getDtmResult())) {
             log.error("TCC transaction prepare fail. returned dtm_result is: {}, transaction gid: {}", resp.getDtmResult(), this.getGid());
@@ -102,10 +102,10 @@ public class Tcc extends TransBase {
         }
         try {
             consumer.accept(this);
-            dtmCommunicationClient.submit(operatorParam);
+            dtmServerStub.submit(operatorParam);
         } catch (Exception e) {
             log.error("TCC transaction submit fail, start abort it. transaction gid: {}", this.getGid());
-            dtmCommunicationClient.abort(operatorParam);
+            dtmServerStub.abort(operatorParam);
             throw new FailureException(e);
         }
         return this.getGid();
@@ -128,7 +128,7 @@ public class Tcc extends TransBase {
 
         TccOperatorParam operatorParam = new TccOperatorParam(this.getGid(), TransTypeEnum.TCC, branchId, Constants.DEFAULT_STATUS,
                 JsonUtils.toJson(body), FeignUtils.generatorURI(confirmMessage, false), FeignUtils.generatorURI(cancelMessage, false));
-        DtmResponse resp = dtmCommunicationClient.registerBranch(operatorParam);
+        DtmResponse resp = dtmServerStub.registerBranch(operatorParam);
         if (!Constants.SUCCESS_RESULT.equals(resp.getDtmResult())) {
             log.error("TCC transaction register branch fail. transaction gid: {}",  this.getGid());
             throw new FailureException("TCC Transaction register branch fail");
@@ -140,7 +140,7 @@ public class Tcc extends TransBase {
         paramsMap.put(ParamFieldConstants.BRANCH_ID, branchId);
         paramsMap.put(ParamFieldConstants.OP, OP);
 
-        feign.Response response = dtmCommunicationClient.busiPost(new URI(FeignUtils.generatorURI(tryMessage, true)),
+        feign.Response response = dtmServerStub.busiPost(new URI(FeignUtils.generatorURI(tryMessage, true)),
                 tryMessage.getPath(), paramsMap, body);
         log.info("busi post is: {}", response);
         FeignUtils.checkResult(response);
@@ -163,7 +163,7 @@ public class Tcc extends TransBase {
 
         TccOperatorParam operatorParam = new TccOperatorParam(this.getGid(), TransTypeEnum.TCC, branchId, Constants.DEFAULT_STATUS,
                 JsonUtils.toJson(body), confirmUrl, cancelUrl);
-        DtmResponse resp = dtmCommunicationClient.registerBranch(operatorParam);
+        DtmResponse resp = dtmServerStub.registerBranch(operatorParam);
         if (!Constants.SUCCESS_RESULT.equals(resp.getDtmResult())) {
             log.error("TCC transaction register branch fail. transaction gid: {}",  this.getGid());
             throw new FailureException("TCC Transaction register branch fail");

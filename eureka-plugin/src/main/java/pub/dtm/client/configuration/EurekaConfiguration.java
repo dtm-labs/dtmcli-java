@@ -22,17 +22,15 @@
  * SOFTWARE.
  */
 
-package pub.dtm.client.interfaces.dtm;
+package pub.dtm.client.configuration;
 
-import pub.dtm.client.model.dtm.TransBase;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 
 /**
- * Functional Interface for Transtype to process busi request
+ * Eureka configuration
  *
- * @param <T>
  * @author horseLk
  */
-@FunctionalInterface
-public interface DtmConsumer<T extends TransBase> {
-    void accept(T t) throws Exception;
+@EnableEurekaClient
+public class EurekaConfiguration {
 }

@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2022 yedf
+ * Copyright (c) 2022 dtm-labs
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 import pub.dtm.client.constant.ParamFieldConstants;
 import pub.dtm.client.enums.TransTypeEnum;
 import pub.dtm.client.exception.FailureException;
-import pub.dtm.client.interfaces.communication.IDtmCommunicationClient;
+import pub.dtm.client.interfaces.stub.IDtmServerStub;
 import pub.dtm.client.model.dtm.TransBase;
 import pub.dtm.client.model.feign.ServiceMessage;
 import pub.dtm.client.model.param.SagaOperatorParam;
@@ -58,7 +58,7 @@ public class Saga extends TransBase {
 
     private static final String CONCURRENT = "concurrent";
 
-    private IDtmCommunicationClient dtmCommunicationClient;
+    private IDtmServerStub dtmServerStub;
 
     private boolean concurrent;
 
@@ -78,11 +78,11 @@ public class Saga extends TransBase {
 
     private List<String> payloads = new ArrayList<>();
 
-    public Saga(String gid, IDtmCommunicationClient dtmCommunicationClient) {
+    public Saga(String gid, IDtmServerStub dtmServerStub) {
         super(gid, TransTypeEnum.SAGA, false);
         this.concurrent = false;
         this.orders = new HashMap<>();
-        this.dtmCommunicationClient = dtmCommunicationClient;
+        this.dtmServerStub = dtmServerStub;
     }
 
     public Saga add(ServiceMessage action, ServiceMessage compensate, Object postData) {
@@ -114,7 +114,7 @@ public class Saga extends TransBase {
 
     public String submit() throws Exception {
         if (StringUtils.isEmpty(this.getGid())) {
-            this.setGid(FeignUtils.parseGid(dtmCommunicationClient.newGid()));
+            this.setGid(FeignUtils.parseGid(dtmServerStub.newGid()));
         }
         addConcurrentContext();
         SagaOperatorParam operatorParam = new SagaOperatorParam(this.getGid(), TransTypeEnum.SAGA, this.getSteps(),
@@ -122,7 +122,7 @@ public class Saga extends TransBase {
                 this.getRetryInterval(), this.getPassthroughHeaders(), this.getBranchHeaders());
 
         try {
-            dtmCommunicationClient.submit(operatorParam);
+            dtmServerStub.submit(operatorParam);
         } catch (Exception e) {
             log.error("saga transaction submit failed, transaction gid is {}", this.getGid());
             throw new FailureException(e);

@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2022 yedf
+ * Copyright (c) 2022 dtm-labs
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+
+/**
+ * Load properties of dtm server
+ *
+ * @author horse
+ */
 public class DtmProperties {
     private static Properties dtmProperties;
 
