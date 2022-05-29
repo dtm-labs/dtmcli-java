@@ -1,4 +1,6 @@
-# dtmcli ![MIT][license-badge]
+# dtmcli-java ![MIT][license-badge]
+
+English | [简体中文](./README-cn.md)
 
 `dtmcli-java` is the Java client SDK for distributed transaction manager [dtm](https://github.com/dtm-labs/dtm)
 
