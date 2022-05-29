@@ -1,6 +1,6 @@
 # dtmcli-java ![MIT][license-badge]
 
-English | [简体中文](./README.md)
+简体中文 | [English](./README.md)
 
 `dtmcli-java` 是分布式事务管理器 [dtm](https://github.com/dtm-labs/dtm) 的Java客户端sdk
 
