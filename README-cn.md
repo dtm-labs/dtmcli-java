@@ -1,4 +1,4 @@
-# dtmcli-java ![MIT][license-badge]
+# dtmcli-java [![MIT][license-badge]](https://github.com/dtm-labs/dtmcli/blob/main/LICENSE)
 
 简体中文 | [English](./README.md)
 
@@ -108,7 +108,5 @@ dtm.ipport=127.0.0.1:36789
 [dtmcli-java-sample-use-configuration](https://github.com/horseLk/dtmcli-java-sample-with-conf)
 #### dtmcli-springcloud使用示例
 [dtmcli-java-spring-sample](https://github.com/dtm-labs/dtmcli-java-spring-sample)
-
-[MIT](https://github.com/dtm-labs/dtmcli/blob/main/LICENSE)
 
 [license-badge]: https://img.shields.io/github/license/dtm-labs/dtmcli-java
