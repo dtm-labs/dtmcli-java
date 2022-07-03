@@ -25,6 +25,7 @@
 package pub.dtm.client.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -35,7 +36,8 @@ import java.io.IOException;
  * @author horseLk
  */
 public class JsonUtils {
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper =
+            new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     public static <T> T parseJson(String json, Class<T> clzz) throws JsonProcessingException {
         return objectMapper.readValue(json, clzz);
