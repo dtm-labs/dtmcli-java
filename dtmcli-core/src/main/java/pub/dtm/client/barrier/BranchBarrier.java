@@ -67,7 +67,13 @@ public class BranchBarrier extends TransBase {
      */
     private int barrierId;
 
+    private ConnectionManager connectionManager;
+
     public BranchBarrier(Map<String, String[]> paramsMap) throws Exception {
+        this(paramsMap, null);
+    }
+
+    public BranchBarrier(Map<String, String[]> paramsMap, ConnectionManager connectionManager) throws Exception {
         if (paramsMap == null || paramsMap.isEmpty()) {
             throw new FailureException("build BranchBarrier error, paramsMap can not be empty.");
         }
@@ -84,6 +90,7 @@ public class BranchBarrier extends TransBase {
         if (ArrayUtils.isNotEmpty(barrierParam.getOp())) {
             this.op = barrierParam.getOp()[0];
         }
+        this.connectionManager = connectionManager;
     }
 
     /**
@@ -109,6 +116,18 @@ public class BranchBarrier extends TransBase {
             connection.setAutoCommit(true);
         }
     }
+
+//    public void call(DtmConsumer<BranchBarrier> consumer) throws Exception {
+//        if (connectionManager == null) {
+//            throw new IllegalStateException(
+//                    "Connection cannot be automatically created because ConnectionManager is not specified"
+//            );
+//        }
+//        connectionManager.<Void>execute(con -> {
+//            call(con, consumer);
+//            return null;
+//        });
+//    }
 
     private boolean insertBarrier(Connection connection) throws SQLException {
         log.info("insert barrier {}", this);
@@ -143,5 +162,4 @@ public class BranchBarrier extends TransBase {
         }
         return true;
     }
-
 }
