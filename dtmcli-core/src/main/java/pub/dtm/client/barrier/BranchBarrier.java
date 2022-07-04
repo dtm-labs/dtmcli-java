@@ -117,17 +117,17 @@ public class BranchBarrier extends TransBase {
         }
     }
 
-    public void call(DtmConsumer<BranchBarrier> consumer) throws Exception {
-        if (connectionManager == null) {
-            throw new IllegalStateException(
-                    "Connection cannot be automatically created because ConnectionManager is not specified"
-            );
-        }
-        connectionManager.<Void>execute(con -> {
-            call(con, consumer);
-            return null;
-        });
-    }
+//    public void call(DtmConsumer<BranchBarrier> consumer) throws Exception {
+//        if (connectionManager == null) {
+//            throw new IllegalStateException(
+//                    "Connection cannot be automatically created because ConnectionManager is not specified"
+//            );
+//        }
+//        connectionManager.<Void>execute(con -> {
+//            call(con, consumer);
+//            return null;
+//        });
+//    }
 
     private boolean insertBarrier(Connection connection) throws SQLException {
         log.info("insert barrier {}", this);
