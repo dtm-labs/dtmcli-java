@@ -1,4 +1,4 @@
-package pub.dtm.client.barrier;
+package pub.dtm.client.barrier.itfc;
 
 import javax.sql.DataSource;
 import java.sql.Connection;

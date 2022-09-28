@@ -146,22 +146,22 @@ public class Saga extends TransBase {
     }
 
     public Saga setTimeoutToFail(long timeoutToFail) {
-        this.setTimeoutToFail(timeoutToFail);
+        this.timeoutToFail = timeoutToFail;
         return this;
     }
 
     public Saga setRetryInterval(long retryInterval) {
-        this.setRetryInterval(retryInterval);
+        this.retryInterval = retryInterval;
         return this;
     }
 
     public Saga setBranchHeaders(Map<String, String> headers) {
-        this.setBranchHeaders(headers);
+        this.branchHeaders = branchHeaders;
         return this;
     }
 
     public Saga setPassthroughHeaders(ArrayList<String> passthroughHeaders) {
-        this.setPassthroughHeaders(passthroughHeaders);
+        this.passthroughHeaders = passthroughHeaders;
         return this;
     }
 

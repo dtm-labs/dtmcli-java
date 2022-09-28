@@ -24,6 +24,8 @@
 
 package pub.dtm.client.barrier;
 
+import pub.dtm.client.barrier.itfc.BarrierDBOperator;
+import pub.dtm.client.barrier.itfc.ConnectionManager;
 import pub.dtm.client.constant.ParamFieldConstants;
 import pub.dtm.client.enums.TransTypeEnum;
 import pub.dtm.client.exception.FailureException;
@@ -95,6 +97,7 @@ public class BranchBarrier extends TransBase {
 
     /**
      * Busi can call method call() to open branch barrier
+     *
      * @param connection data source connection
      * @param consumer consumer
      * @throws Exception exception
@@ -114,6 +117,29 @@ public class BranchBarrier extends TransBase {
             throw exception;
         } finally {
             connection.setAutoCommit(true);
+        }
+    }
+
+    /**
+     * Busi can call method call() to open branch barrier
+     *
+     * @param DBOperator db operator
+     * @param consumer busi consumer
+     * @throws Exception exception
+     */
+    public void call(BarrierDBOperator DBOperator, DtmConsumer<BranchBarrier> consumer) throws Exception {
+        ++this.barrierId;
+        try {
+            boolean insertRes = DBOperator.insertBarrier(this.getTransTypeEnum().getValue(), this.getGid(), branchId, this.op,
+                    this.barrierId);
+            if (insertRes) {
+                consumer.accept(this);
+                DBOperator.commit();
+            }
+        } catch (Exception exception) {
+            log.warn("barrier call error", exception);
+            DBOperator.rollback();
+            throw new Exception(exception);
         }
     }
 

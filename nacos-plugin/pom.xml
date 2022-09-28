@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>nacos-plugin</artifactId>
-    <version>2.1.5.1</version>
+    <version>2.1.6.1</version>
     <packaging>jar</packaging>
     <name>nacos-plugin</name>
 
