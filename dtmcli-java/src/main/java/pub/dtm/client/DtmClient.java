@@ -53,7 +53,7 @@ import static com.alibaba.nacos.api.naming.CommonParams.GROUP_NAME;
 public class DtmClient {
     private static final Logger log = LoggerFactory.getLogger(DtmClient.class);
 
-    private IDtmServerStub dtmServerStub;
+    private final IDtmServerStub dtmServerStub;
 
     public DtmClient() {
         // init URIParser
