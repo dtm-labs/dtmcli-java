@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dtmcli-springcloud</artifactId>
-    <version>2.1.5.2</version>
+    <version>2.1.6.2</version>
     <packaging>jar</packaging>
     <name>dtmcli-springcloud</name>
 
@@ -19,15 +19,22 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
-        <springboot.version>2.6.3</springboot.version>
-        <spring-cloud.version>2021.0.1</spring-cloud.version>
+        <spring-cloud.version>2020.0.5</spring-cloud.version>
+        <springboot.version>2.4.8</springboot.version>
+        <alibaba-cloud.version>2021.1</alibaba-cloud.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>io.github.dtm-labs</groupId>
+            <artifactId>dtmcli-common</artifactId>
+            <version>2.1.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.dtm-labs</groupId>
             <artifactId>dtmcli-core</artifactId>
-            <version>2.1.5</version>
+            <version>2.1.6</version>
         </dependency>
 
         <dependency>
@@ -48,7 +55,7 @@
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
     </dependencies>
-
+    
     <dependencyManagement>
         <dependencies>
             <dependency>
