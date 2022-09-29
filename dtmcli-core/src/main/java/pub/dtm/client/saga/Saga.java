@@ -155,7 +155,7 @@ public class Saga extends TransBase {
         return this;
     }
 
-    public Saga setBranchHeaders(Map<String, String> headers) {
+    public Saga setBranchHeaders(Map<String, String> branchHeaders) {
         this.branchHeaders = branchHeaders;
         return this;
     }
