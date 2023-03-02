@@ -171,7 +171,7 @@ public class Saga extends TransBase {
             data.put(ORDERS, orders);
             data.put(CONCURRENT, true);
             try {
-                this.setCustomData(JsonUtils.toJson(data));
+                this.customData = JsonUtils.toJson(data);
             } catch (Exception e) {
                 log.error("encode json error.");
             }
