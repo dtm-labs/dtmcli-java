@@ -89,6 +89,16 @@ public class FeignUtils {
      * @throws FailureException exception
      */
     public static void checkResult(Response response) throws FailureException {
+        checkResultWithReturn(response);
+    }
+
+    /**
+     * check response and return result
+     * @param response
+     * @return
+     * @throws FailureException
+     */
+    public static String checkResultWithReturn(Response response) throws FailureException {
         if (response.status() >= Constants.RESP_ERR_CODE){
             if (response.reason() != null) {
                 throw new FailureException(response.reason());
@@ -115,5 +125,6 @@ public class FeignUtils {
         if (result.contains(Constants.FAILURE_RESULT)){
             throw new FailureException("Service returned failed");
         }
+        return result;
     }
 }

@@ -155,7 +155,7 @@ public class Saga extends TransBase {
         return this;
     }
 
-    public Saga setBranchHeaders(Map<String, String> headers) {
+    public Saga setBranchHeaders(Map<String, String> branchHeaders) {
         this.branchHeaders = branchHeaders;
         return this;
     }
@@ -171,7 +171,7 @@ public class Saga extends TransBase {
             data.put(ORDERS, orders);
             data.put(CONCURRENT, true);
             try {
-                this.setCustomData(JsonUtils.toJson(data));
+                this.customData = JsonUtils.toJson(data);
             } catch (Exception e) {
                 log.error("encode json error.");
             }

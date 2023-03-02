@@ -108,6 +108,16 @@ public class HttpUtils {
      * @throws Exception exception
      */
     public static void checkResult(Response response) throws Exception {
+        checkResultWithReturn(response);
+    }
+
+    /**
+     * check response and return result
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    public static String checkResultWithReturn(Response response) throws Exception {
         if (response.code() >= Constants.RESP_ERR_CODE){
             throw new FailureException(response.message());
         }
@@ -119,5 +129,6 @@ public class HttpUtils {
         if (result.contains(Constants.FAILURE_RESULT)){
             throw new FailureException("Service returned failed");
         }
+        return result;
     }
 }
