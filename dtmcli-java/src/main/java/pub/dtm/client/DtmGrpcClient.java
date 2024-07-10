@@ -28,7 +28,7 @@ import io.grpc.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pub.dtm.client.grpc.DtmGrpc;
-import pub.dtm.client.grpc.SagaGrpc;
+import pub.dtm.client.saga.SagaGrpc;
 
 public class DtmGrpcClient {
     private static final Logger log = LoggerFactory.getLogger(DtmGrpcClient.class);

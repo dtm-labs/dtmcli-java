@@ -20,7 +20,6 @@
         <module>dtmcli-java</module>
         <module>nacos-plugin</module>
         <module>eureka-plugin</module>
-        <module>dtm-grpc</module>
     </modules>
 
     <properties>

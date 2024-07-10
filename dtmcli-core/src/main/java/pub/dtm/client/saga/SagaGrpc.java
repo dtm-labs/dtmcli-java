@@ -22,27 +22,27 @@
  * SOFTWARE.
  */
 
-package pub.dtm.client.grpc;
+package pub.dtm.client.saga;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Empty;
 import com.google.protobuf.GeneratedMessageV3;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pub.dtm.client.enums.TransTypeEnum;
 import pub.dtm.client.exception.FailureException;
-import pub.dtm.client.grpc.Dtmgimp.DtmRequest;
-import pub.dtm.client.grpc.Dtmgimp.DtmTransOptions;
+import pub.dtm.client.grpc.DtmGrpc.*;
+import pub.dtm.client.grpc.Dtmgimp.*;
 import pub.dtm.client.model.dtm.TransBase;
 import pub.dtm.client.utils.JsonUtils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @Data
@@ -61,9 +61,9 @@ public class SagaGrpc extends TransBase {
 
     private long retryInterval;
 
-    private final DtmGrpc.DtmBlockingStub dtmBlockingStub;
+    private final DtmBlockingStub dtmBlockingStub;
 
-    private final Dtmgimp.DtmRequest.Builder dtmRequest = DtmRequest.newBuilder();
+    private final DtmRequest.Builder dtmRequest = DtmRequest.newBuilder();
 
     private List<Map<String, String>> steps = new ArrayList<>();
 
@@ -73,7 +73,7 @@ public class SagaGrpc extends TransBase {
 
     private Map<String, List<Integer>> orders = new HashMap<>();
 
-    public SagaGrpc(String gid, DtmGrpc.DtmBlockingStub dtmServerStub) {
+    public SagaGrpc(String gid, DtmBlockingStub dtmServerStub) {
         super(gid, TransTypeEnum.SAGA, false);
         this.dtmBlockingStub = dtmServerStub;
     }
@@ -96,12 +96,12 @@ public class SagaGrpc extends TransBase {
     public String submit() throws FailureException {
         if (StringUtils.isEmpty(this.getGid())) {
             Empty empty = Empty.newBuilder().build();
-            Dtmgimp.DtmGidReply gidReply = this.dtmBlockingStub.newGid(empty);
+            DtmGidReply gidReply = this.dtmBlockingStub.newGid(empty);
             this.setGid(gidReply.getGid());
         }
 
         this.addConcurrentContext();
-        Dtmgimp.DtmRequest.Builder dtmRequest = this.dtmRequest;
+        DtmRequest.Builder dtmRequest = this.dtmRequest;
 
         try {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -122,8 +122,8 @@ public class SagaGrpc extends TransBase {
         return this.getGid();
     }
 
-    Dtmgimp.DtmTransOptions getRequestOptions() {
-        Dtmgimp.DtmTransOptions.Builder options = DtmTransOptions.newBuilder()
+    DtmTransOptions getRequestOptions() {
+        DtmTransOptions.Builder options = DtmTransOptions.newBuilder()
                 .setWaitResult(this.isWaitResult())
                 .setRetryLimit(this.retryLimit)
                 .setRequestTimeout(this.requestTimeout)
