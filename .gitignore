@@ -25,3 +25,10 @@ hs_err_pid*
 .idea
 *.iml
 /*/target/
+
+# zed.app
+.zed
+.classpath
+.factorypath
+.project
+.settings/
