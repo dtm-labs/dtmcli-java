@@ -4,6 +4,23 @@ English | [简体中文](./README-cn.md)
 
 `dtmcli-java` is the Java client SDK for distributed transaction manager [dtm](https://github.com/dtm-labs/dtm)
 
+## Quick Start with Maven Wrapper
+
+This project includes the Maven Wrapper (`mvnw`) to ensure consistent builds across environments:
+
+```bash
+# Build the project using Maven Wrapper
+./mvnw clean install
+
+# Run tests
+./mvnw test
+
+# Compile the code
+./mvnw compile
+```
+
+Using the Maven Wrapper ensures that all developers use the same Maven version, avoiding "works on my machine" issues.
+
 ## What is DTM
 
 DTM is a distributed transaction framework which provides cross-service eventual data consistency. It provides saga, tcc, xa, 2-phase message, outbox patterns for a variety of application scenarios. It also supports multiple languages and multiple store engine to form up a transaction as following:

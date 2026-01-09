@@ -4,6 +4,23 @@
 
 `dtmcli-java` 是分布式事务管理器 [dtm](https://github.com/dtm-labs/dtm) 的Java客户端sdk
 
+## 使用 Maven Wrapper 快速开始
+
+本项目包含了 Maven Wrapper (`mvnw`) 来确保跨环境的一致性构建：
+
+```bash
+# 使用 Maven Wrapper 构建项目
+./mvnw clean install
+
+# 运行测试
+./mvnw test
+
+# 编译代码
+./mvnw compile
+```
+
+使用 Maven Wrapper 可以确保所有开发者使用相同的 Maven 版本，避免出现 "在我机器上可以运行" 的问题。
+
 ## DTM是什么
 
 DTM是一款变革性的分布式事务框架，提供了傻瓜式的使用方式，极大的降低了分布式事务的使用门槛，改变了“能不用分布式事务就不用”的行业现状，优雅的解决了服务间的数据一致性问题。
