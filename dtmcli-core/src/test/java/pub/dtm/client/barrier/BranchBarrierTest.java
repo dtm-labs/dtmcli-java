@@ -154,9 +154,9 @@ class BranchBarrierTest {
     }
 
     @Test
-    void sqlserver_call1() throws Exception {
+    void sqlserver_call_with_connection() throws Exception {
         BranchBarrier branchBarrier = new BranchBarrier();
-        branchBarrier.setGid("gid-unit-test1-" + System.currentTimeMillis());
+        branchBarrier.setGid("gid-unit-test1-" + UUID.randomUUID());
         branchBarrier.setTransTypeEnum(TransTypeEnum.TCC);
         branchBarrier.setBranchId("branch-1");
         branchBarrier.setOp("try");
@@ -168,16 +168,120 @@ class BranchBarrierTest {
     }
 
     @Test
-    void sqlserver_call2() throws Exception {
+    void sqlserver_call_with_connection_null() throws Exception {
         BranchBarrier branchBarrier = new BranchBarrier();
-        branchBarrier.setGid("gid-unit-test2-" + System.currentTimeMillis());
+        branchBarrier.setGid("gid-unit-test1-" + UUID.randomUUID());
+        branchBarrier.setTransTypeEnum(TransTypeEnum.TCC);
+        branchBarrier.setBranchId("branch-1");
+        branchBarrier.setOp("try");
+
+
+        Exception ex = assertThrows(IllegalArgumentException.class, () -> {
+            Connection connection = null;
+            branchBarrier.call(new BarrierSqlServerOperator(connection), (barrier) -> {
+                BusiUtil.adjustBalance(connection, new TransReq(1, 30), DbType.SQLSERVER);
+            });
+        });
+        assert ex.getMessage().equals("connection can not be null");
+    }
+
+    @Test
+    void sqlserver_call_with_BarrierSqlServerOperator_OK() throws Exception {
+        BranchBarrier branchBarrier = new BranchBarrier();
+        branchBarrier.setGid("gid-unit-test2-" + UUID.randomUUID());
         branchBarrier.setTransTypeEnum(TransTypeEnum.TCC);
         branchBarrier.setBranchId("branch-1");
         branchBarrier.setOp("try");
 
         Connection connection = BusiUtil.getSqlServerConnection();
+
         branchBarrier.call(new BarrierSqlServerOperator(connection), (barrier) -> {
             BusiUtil.adjustTrading(connection, new TransReq(1, 30), DbType.SQLSERVER);
         });
+    }
+
+    @Test
+    void sqlserver_call_with_BarrierSqlServerOperator_FAILURE() throws Exception {
+        BranchBarrier branchBarrier = new BranchBarrier();
+        branchBarrier.setGid("gid-unit-test2-" + UUID.randomUUID());
+        branchBarrier.setTransTypeEnum(TransTypeEnum.TCC);
+        branchBarrier.setBranchId("branch-1");
+        branchBarrier.setOp("try");
+
+        Connection connection = BusiUtil.getSqlServerConnection();
+        SQLException thrown = assertThrows(SQLException.class, () -> {
+            branchBarrier.call(new BarrierSqlServerOperator(connection), (barrier) -> {
+                TransReq trans = new TransReq(1, 30);
+                trans.ex = new SQLException("my SQLException");
+                BusiUtil.adjustTrading(connection, trans, DbType.SQLSERVER);
+            });
+        });
+        assert "my SQLException".equals(thrown.getMessage()) : "Expected message 'my SQLException', but got: " + thrown.getMessage();
+    }
+
+    @Test
+    void sqlserver_call_with_BarrierSqlServerOperator_ONGOING() throws Exception {
+
+        String gid = "gid-unit-test2-" + UUID.randomUUID();
+        // 先进入的，业务体35秒后报异常。异步调用让后调用的进入
+        Thread asyncThread = new Thread(() -> {
+            try {
+                BranchBarrier branchBarrier = new BranchBarrier();
+                branchBarrier.setGid(gid);
+                branchBarrier.setTransTypeEnum(TransTypeEnum.TCC);
+                branchBarrier.setBranchId("branch-1");
+                branchBarrier.setOp("try");
+
+                Connection connection = BusiUtil.getSqlServerConnection();
+                branchBarrier.call(new BarrierSqlServerOperator(connection), (barrier) -> {
+                    TransReq trans = new TransReq(1, 20);
+                    trans.sleepDuration = Duration.ofSeconds(35);
+                    trans.ex = new SQLException("my SQLException");
+                    BusiUtil.adjustTrading(connection, trans, DbType.SQLSERVER);
+                });
+            } catch (Exception e) {
+                try {
+                    throw new RuntimeException(e);
+                } catch (Exception ex) {
+                    // pass
+                }
+            }
+        });
+        asyncThread.start();
+
+        // 等待2秒再次调用, 应当被屏障挡住，因为调用1还未完成
+        Thread.sleep(Duration.ofSeconds(2).toMillis());
+        {
+            BranchBarrier branchBarrier = new BranchBarrier();
+            branchBarrier.setGid(gid);
+            branchBarrier.setTransTypeEnum(TransTypeEnum.TCC);
+            branchBarrier.setBranchId("branch-1");
+            branchBarrier.setOp("try");
+
+            Connection connection = BusiUtil.getSqlServerConnection();
+            DtmOngingException thrown = assertThrows(DtmOngingException.class, () -> {
+                branchBarrier.call(new BarrierSqlServerOperator(connection), (barrier) -> {
+                    // pass， 因为
+                    throw new Exception("should pass");
+                });
+            });
+            assert "The query has timed out.".equals(thrown.getMessage()) ;
+
+        }
+
+        // 40秒后再次调用会成功, 调用1抛异常回滚
+        Thread.sleep(Duration.ofSeconds(40).toMillis());
+        {
+            BranchBarrier branchBarrier = new BranchBarrier();
+            branchBarrier.setGid(gid);
+            branchBarrier.setTransTypeEnum(TransTypeEnum.TCC);
+            branchBarrier.setBranchId("branch-1");
+            branchBarrier.setOp("try");
+
+            Connection connection = BusiUtil.getSqlServerConnection();
+            branchBarrier.call(new BarrierSqlServerOperator(connection), (barrier) -> {
+                BusiUtil.adjustTrading(connection, new TransReq(1, 30), DbType.SQLSERVER);
+            });
+        }
     }
 }
