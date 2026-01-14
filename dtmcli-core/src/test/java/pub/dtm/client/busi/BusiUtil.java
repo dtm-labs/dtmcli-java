@@ -35,6 +35,11 @@ public class BusiUtil {
      * @throws SQLException
      */
     public static void adjustTrading(Connection connection, TransReq transReq, DbType dbType) throws Exception {
+        if (transReq.sleepDuration != null)
+            Thread.sleep(transReq.sleepDuration.toMillis());
+
+        if (transReq.ex != null)
+            throw transReq.ex;
 
         String sql = "update %s set trading_balance=trading_balance+?"
                 + " where user_id=? and trading_balance + ? + balance >= 0";
@@ -62,7 +67,7 @@ public class BusiUtil {
     /**
      * 更新余额
      */
-    public static void adjustBalance(Connection connection, TransReq transReq) throws SQLException {
+    public static void adjustBalance(Connection connection, TransReq transReq) throws Exception {
         adjustBalance(connection, transReq, DbType.MYSQL);
     }
 
@@ -74,7 +79,13 @@ public class BusiUtil {
      * @param dbType
      * @throws SQLException
      */
-    public static void adjustBalance(Connection connection, TransReq transReq, DbType dbType) throws SQLException {
+    public static void adjustBalance(Connection connection, TransReq transReq, DbType dbType) throws Exception {
+        if (transReq.ex != null)
+            throw transReq.ex;
+
+        if (transReq.sleepDuration != null)
+            Thread.sleep(transReq.sleepDuration.toMillis());
+
         PreparedStatement preparedStatement = null;
         try {
             String sql = "update %s set trading_balance=trading_balance-?,balance=balance+? where user_id=?";
