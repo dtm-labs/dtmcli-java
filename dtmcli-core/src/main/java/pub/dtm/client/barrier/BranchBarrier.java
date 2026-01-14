@@ -25,9 +25,15 @@
 package pub.dtm.client.barrier;
 
 import pub.dtm.client.barrier.itfc.BarrierDBOperator;
+import pub.dtm.client.barrier.itfc.BarrierInsertResult;
 import pub.dtm.client.barrier.itfc.ConnectionManager;
+import pub.dtm.client.barrier.itfc.impl.BarrierMysqlOperator;
+import pub.dtm.client.constant.BarrierConstants;
 import pub.dtm.client.constant.ParamFieldConstants;
 import pub.dtm.client.enums.TransTypeEnum;
+import pub.dtm.client.exception.DtmDuplicatedException;
+import pub.dtm.client.exception.DtmException;
+import pub.dtm.client.exception.DtmOngingException;
 import pub.dtm.client.exception.FailureException;
 import pub.dtm.client.interfaces.dtm.DtmConsumer;
 import lombok.Data;
@@ -103,21 +109,12 @@ public class BranchBarrier extends TransBase {
      * @throws Exception exception
      */
     public void call(Connection connection, DtmConsumer<BranchBarrier> consumer) throws Exception {
-        ++this.barrierId;
-        connection.setAutoCommit(false);
-        try {
-            boolean result = insertBarrier(connection);
-            if (result) {
-                consumer.accept(this);
-                connection.commit();
-            }
-        } catch (Exception exception) {
-            log.warn("barrier call error", exception);
-            connection.rollback();
-            throw exception;
-        } finally {
-            connection.setAutoCommit(true);
-        }
+        if (Objects.isNull(connection))
+            throw new IllegalArgumentException("connection can not be null");
+
+        BarrierDBOperator operator = new BarrierMysqlOperator(connection);
+
+        call(operator, consumer);
     }
 
     /**
@@ -130,17 +127,61 @@ public class BranchBarrier extends TransBase {
     public void call(BarrierDBOperator DBOperator, DtmConsumer<BranchBarrier> consumer) throws Exception {
         ++this.barrierId;
         try {
-            boolean insertRes = DBOperator.insertBarrier(this.getTransTypeEnum().getValue(), this.getGid(), branchId, this.op,
-                    this.barrierId);
-            if (insertRes) {
-                consumer.accept(this);
-                DBOperator.commit();
+            String originOp = BarrierConstants.OP_DICT.get(this.op);
+            if (originOp == null) {
+                originOp = "";
             }
-        } catch (Exception exception) {
-            log.warn("barrier call error", exception);
+            BarrierInsertResult originInsertRes = DBOperator.insertBarrier(this.getTransTypeEnum().getValue(), this.getGid(), branchId, originOp, this.barrierId, this.op);
+            if (originInsertRes.getException() != null)
+            {
+                throw new DtmOngingException(originInsertRes.getException().getMessage());
+            }
+
+            BarrierInsertResult currentInsertRes = DBOperator.insertBarrier(this.getTransTypeEnum().getValue(), this.getGid(), branchId, this.op, this.barrierId, this.op);
+            if (currentInsertRes.getException() != null)
+            {
+                throw new DtmOngingException(currentInsertRes.getException().getMessage());
+            }
+
+            if (isMsgRejected(currentInsertRes.getException(), this.op, currentInsertRes.getAffectedRows())){
+                throw new DtmDuplicatedException();
+            }
+
+            boolean isNullCompensation = isNullCompensation(this.op, originInsertRes.getAffectedRows());
+            boolean isDuplicateOrPend = isDuplicateOrPend(currentInsertRes.getAffectedRows());
+
+            if (isNullCompensation || isDuplicateOrPend)
+            {
+                log.warn(String.format("Will not exec busiCall, isNullCompensation=%s, isDuplicateOrPend=%s",isNullCompensation, isDuplicateOrPend));
+                return;
+            }
+            consumer.accept(this);
+            DBOperator.commit();
+        } catch (DtmException e) {
+            log.warn(String.format("dtm known %s, gid=%s, trans_type=%s",e.getMessage(), this.getGid(), this.getTransTypeEnum().getValue()));
             DBOperator.rollback();
-            throw new Exception(exception);
+            throw e;
         }
+        catch (Exception e) {
+            log.warn(String.format("Call error %s, gid=%s, trans_type=%s",e.getMessage(), this.getGid(), this.getTransTypeEnum().getValue()));
+            DBOperator.rollback();
+            throw e;
+        }
+    }
+
+
+    private boolean isMsgRejected(Exception err, String op, int currentAffected) {
+        return (err == null || err.getMessage() == null || err.getMessage().trim().isEmpty())
+                && ParamFieldConstants.MESSAGE.equals(op)
+                && currentAffected == 0;
+    }
+
+    private boolean isNullCompensation(String op, int originAffected) {
+        return (ParamFieldConstants.CANCEL.equals(op) || ParamFieldConstants.COMPENSATE.equals(op)) && originAffected > 0;
+    }
+
+    private boolean isDuplicateOrPend(int currentAffected) {
+        return currentAffected == 0;
     }
 
 //    public void call(DtmConsumer<BranchBarrier> consumer) throws Exception {
@@ -154,38 +195,4 @@ public class BranchBarrier extends TransBase {
 //            return null;
 //        });
 //    }
-
-    private boolean insertBarrier(Connection connection) throws SQLException {
-        log.info("insert barrier {}", this);
-        if (Objects.isNull(connection)) {
-            return false;
-        }
-        PreparedStatement preparedStatement = null;
-        try {
-            String sql = "insert ignore into barrier(trans_type, gid, branch_id, op, barrier_id, reason) values(?,?,?,?,?,?)";
-            preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setString(1, this.getTransTypeEnum().getValue());
-            preparedStatement.setString(2, this.getGid());
-            preparedStatement.setString(3, branchId);
-            preparedStatement.setString(4, op);
-            preparedStatement.setString(5, String.format("%02d", barrierId));
-            preparedStatement.setString(6, op);
-
-            if (preparedStatement.executeUpdate() == 0) {
-                return false;
-            }
-            if (ParamFieldConstants.CANCEL.equals(op)) {
-                int opIndex = 4;
-                preparedStatement.setString(opIndex, ParamFieldConstants.TRY);
-                if (preparedStatement.executeUpdate() > 0) {
-                    return false;
-                }
-            }
-        } finally {
-            if (Objects.nonNull(preparedStatement)) {
-                preparedStatement.close();
-            }
-        }
-        return true;
-    }
 }

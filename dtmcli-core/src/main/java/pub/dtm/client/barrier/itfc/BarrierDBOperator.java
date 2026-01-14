@@ -19,6 +19,17 @@ public interface BarrierDBOperator {
     boolean insertBarrier(String transType, String gid, String branchId, String op, int barrierId) throws Exception;
 
     /**
+     *
+     * @param transType Trans type
+     * @param gid gid
+     * @param branchId branch ID
+     * @param op operator
+     * @param barrierId barrier ID
+     * @return BarrierInsertResult
+     */
+    BarrierInsertResult insertBarrier(String transType, String gid, String branchId, String op, int barrierId, String reason) throws Exception;
+
+    /**
      * commit transaction
      * @throws Exception
      */
